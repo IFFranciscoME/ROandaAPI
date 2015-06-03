@@ -44,32 +44,32 @@ PrecioActual <- function(CuentaTipo,Token,Instrumento){
 
 # Peticion de precios historicos ---------------------------------------------------------------------- #
 
-PreciosHist  <- function(CuentaTipo,Cantidad,Periodicidad,AlineacionDia,AlineacionTiem,Token,Instrumento){
-  if(CuentaTipo == "practice"){
+PreciosHist  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,Instrument){
+  if(AccountType == "practice"){
     httpcuenta  <- "https://api-fxpractice.oanda.com"
   } else 
-    if(CuentaTipo == "live"){
+    if(AccountType == "live"){
       httpcuenta  <- "https://api-fxtrade.oanda.com"
     } else print("error tipo de cuenta no reconocido")
   
-  qcount  <- paste("count=",Cantidad,sep="")
+  qcount  <- paste("count=",Count,sep="")
   qcandleFormat  <- "candleFormat=midpoint"
-  qgranularity   <- paste("granularity=",Periodicidad,sep="")
-  qdailyalignment    <- paste("dailyAlignment=",AlineacionDia,sep="")
-  qalignmentTimezone <- paste("alignmentTimezone=",AlineacionTiem,sep="")
+  qgranularity   <- paste("granularity=",Granularity,sep="")
+  qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
+  qalignmentTimezone <- paste("alignmentTimezone=",TimeAlign,sep="")
   
   auth           <- c(Authorization = paste("Bearer",Token,sep=" "))
   QueryHistPrec  <- paste(httpcuenta,"/v1/candles?instrument=",sep="")
-  QueryHistPrec1 <- paste(QueryHistPrec,Instrumento,sep="")
+  QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
   QueryHistPrec2 <- paste(QueryHistPrec1,qcount,qcandleFormat,qgranularity,
                           qdailyalignment,qalignmentTimezone,sep="&")
   InstHistP      <- getURL(QueryHistPrec2,cainfo=system.file("CurlSSL","cacert.pem",
-                                                             package="RCurl"),httpheader=auth)
+                    package="RCurl"),httpheader=auth)
   InstHistPjson  <- fromJSON(InstHistP, simplifyDataFrame = TRUE)
-  precios        <- data.frame(InstHistPjson[[3]])
-  precios$time   <- as.POSIXct(substr(precios$time,12,19),format = "%H:%M:%S") + 6*60*60
-  colnames(precios) <- c("Tiempo","Open","High","Low","Close","TickVolume","Complete")
-  return(precios)
+  Prices         <- data.frame(InstHistPjson[[3]])
+  Prices$Time    <- as.POSIXct(substr(Prices$time,12,19),format = "%H:%M:%S")
+  colnames(Prices) <- c("Time","Open","High","Low","Close","TickVolume","Complete")
+  return(Prices)
 }
 # Petici?n de cuentas por usuario --------------------------------------------------------------------- #
 
