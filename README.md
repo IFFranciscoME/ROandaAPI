@@ -13,6 +13,11 @@ At Oanda one can trade more than just *FOREX* market, but mainly it is that, so 
 - **Wiki source:** [Investopedia](http://www.investopedia.com/university/forexmarket/)
 - **Authority:** [Office of Investor Education and Advocacy](http://www.sec.gov/investor/alerts/forextrading.pdf)
 
+And about What and API, REST API are ?
+
+- **Mayor Brand source:** [IBM Developer Works](http://www.ibm.com/developerworks/library/ws-restful/)
+- **Wiki source:** [RestApiTutorial](http://www.restapitutorial.com/lessons/whatisrest.html)
+
 ## Getting Started
 
 1. **Have an account:** You must actually get an account with OANDA, either *Live* or *Practice* is ok and exactly the same, if you do not have one you can create it from here [Open Account](https://fxtrade.oanda.com/your_account/fxtrade/register/gate?utm_source=oandaapi&utm_medium=link&utm_campaign=devportaldocs_demo)
@@ -43,8 +48,8 @@ downloader::source_url("http://bit.ly/GitHubROandaAPI",prompt=FALSE,quiet=TRUE)
 
 OANDA has a dedicated page to provide all sort of help and examples for developers, in many languages, you can always go there and consider have a resource full place for you Algorithmic Trading.
 
-- [Developtment Guide](http://developer.oanda.com/rest-live/development-guide/)
-- [Authentication](http://developer.oanda.com/rest-live/authentication/)
-- [Troubleshooting](http://developer.oanda.com/rest-live/troubleshooting-errors/)
-- [Sample Codes](http://developer.oanda.com/rest-live/sample-code/)
-- [Interactive Console](http://developer.oanda.com/rest-practice/console/)
+- [Developtment Guide](http://developer.oanda.com/rest-live/development-guide/) Basic introductory guide
+- [Authentication](http://developer.oanda.com/rest-live/authentication/) When Authentication Enters
+- [Troubleshooting](http://developer.oanda.com/rest-live/troubleshooting-errors/) Breath and then Read
+- [Sample Codes](http://developer.oanda.com/rest-live/sample-code/) So this actually works, huh?
+- [Interactive Console](http://developer.oanda.com/rest-practice/console/) Try before implement
