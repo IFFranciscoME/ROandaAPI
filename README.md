@@ -24,11 +24,19 @@ At Oanda one can trade more than just *FOREX* market, but mainly it is that, so 
 ## *R* Requirements
 - Any version its ok.
 - Does not have to be used RStudio or any other GUI for *R*.
-- Following packages will be need it.
+- Following packages will be needed.
 
 ```r
 library (httr)             # Tools for Working with URLs and HTTP
 library (RCurl)            # General network (HTTP/FTP/...) client interface for R
 library (jsonlite)         # A Robust, High Performance JSON Parser and Generator for R
+library (downloader)       # for downloading files over http and https. (OPTIONAL)
+```
+The previous packages are actually necessary not for running the functions, those are regular expressions of R, but when you call and execute them in your code. Thats because some functions i used inside the API.
+
+in case you prefer have access to this API with one line of code, you can use the following and the functions will available locally *(Note: You must run this code every time you begin R Session).*
+
+```r
+downloader::source_url("http://bit.ly/GitHubROandaAPI",prompt=FALSE,quiet=TRUE)
 ```
 
