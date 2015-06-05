@@ -39,4 +39,12 @@ in case you prefer have access to this API with one line of code, you can use th
 ```r
 downloader::source_url("http://bit.ly/GitHubROandaAPI",prompt=FALSE,quiet=TRUE)
 ```
+## More Official Resources
 
+OANDA has a dedicated page to provide all sort of help and examples for developers, in many languages, you can always go there and consider have a resource full place for you Algorithmic Trading.
+
+- [Developtment Guide](http://developer.oanda.com/rest-live/development-guide/)
+- [Authentication](http://developer.oanda.com/rest-live/authentication/)
+- [Troubleshooting](http://developer.oanda.com/rest-live/troubleshooting-errors/)
+- [Sample Codes](http://developer.oanda.com/rest-live/sample-code/)
+- [Interactive Console](http://developer.oanda.com/rest-practice/console/)
