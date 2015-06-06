@@ -64,14 +64,17 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
   QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
   QueryHistPrec2 <- paste(QueryHistPrec1,qcount,qcandleFormat,qgranularity,
                     qdailyalignment,qalignmentTimezone,sep="&")
-  InstHistP      <- getURL(QueryHistPrec2,cainfo=system.file("CurlSSL","cacert.pem",
-                    package="RCurl"),httpheader=auth)
-  InstHistPjson  <- fromJSON(InstHistP, simplifyDataFrame = TRUE)
-  Prices         <- data.frame(InstHistPjson[[3]])
-  Prices$Time    <- as.POSIXct(substr(Prices$time,12,19),format = "%H:%M:%S")
-  colnames(Prices) <- c("Time","Open","High","Low","Close","TickVolume","Complete")
+  InstHistP <- getURL(QueryHistPrec2,cainfo=system.file("CurlSSL","cacert.pem",
+               package="RCurl"),httpheader=auth)
+  InstHistPjson <- fromJSON(InstHistP, simplifyDataFrame = TRUE)
+  Prices        <- data.frame(InstHistPjson[[3]])
+  Prices$Times  <- substr(Prices$time,12,19)
+  Prices$Dates  <- substr(Prices$time,1,10)
+  Prices <- cbind(Prices$Dates,Prices$Times,Prices[,2:7])
+  colnames(Prices) <- c("Date","Time","Open","High","Low","Close","TickVolume","Complete")
   return(Prices)
 }
+
 # Accounts per given username  ------------------------------------------------------------------------ #
 
 UsersAccounts <- function(AccountType,Token,UserName){
