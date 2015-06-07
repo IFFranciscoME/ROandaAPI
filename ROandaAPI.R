@@ -47,8 +47,10 @@ ActualPrice <- function(AccountType,Token,Instrument){
   InstPrecjson <- fromJSON(InstPrec, simplifyDataFrame = TRUE)
   DateTime     <- as.POSIXct(substr(InstPrecjson[[1]]$time,12,19),
                   format = "%H:%M:%S")
-  DataJSON    <- data.frame(DateTime,InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
-  colnames(DataJSON) <- c("Time","Bid","Ask")
+  Date <- as.character(substr(DateTime,1,10))
+  Time <- as.character(substr(DateTime,12,19))
+  DataJSON     <- data.frame(Date,Time,InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
+  colnames(DataJSON) <- c("Date","Time","Bid","Ask")
   return(DataJSON)
 }
 
