@@ -4,7 +4,7 @@ R Code API for Forex Trading with OANDA Broker (CFTC and SEC regulated retail br
 
 - **Initial Developer:** IF.FranciscoME
 - **License:** GNU General Public License
-- **Location:** Guadalajara
+- **Location:** Guadalajara, México
 
 ## Previous Reading
 
