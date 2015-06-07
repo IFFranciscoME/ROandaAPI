@@ -46,7 +46,7 @@ ActualPrice <- function(AccountType,Token,Instrument){
                   package="RCurl"),httpheader=auth)
   InstPrecjson <- fromJSON(InstPrec, simplifyDataFrame = TRUE)
   DateTime     <- as.POSIXct(substr(InstPrecjson[[1]]$time,12,19),
-                  format = "%H:%M:%S") + 6*60*60
+                  format = "%H:%M:%S")
   DataJSON    <- data.frame(DateTime,InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
   colnames(DataJSON) <- c("Tiempo","Bid","Ask")
   return(DataJSON)
