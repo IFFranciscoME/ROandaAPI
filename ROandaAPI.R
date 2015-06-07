@@ -3,6 +3,15 @@
 
 # List of available instruments ----------------------------------------------------------------------- #
 
+if (!require(downloader)) install.packages('downloader', quiet = TRUE)
+suppressMessages(library (downloader))
+if (!require(httr))       install.packages('httr', quiet = TRUE)
+suppressMessages(library (httr))
+if (!require(jsonlite))   install.packages('jsonlite', quiet = TRUE)
+suppressMessages(library (jsonlite))
+if (!require(RCurl))      install.packages('RCurl', quiet = TRUE)
+suppressMessages(library (RCurl))
+
 InstrumentsList <- function(AccountType,Token,AccountID){
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
