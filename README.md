@@ -4,7 +4,7 @@ R Code API for Forex Trading with OANDA Broker (CFTC and SEC regulated retail br
 
 - **Initial Developer:** IF.FranciscoME
 - **License:** GNU General Public License
-- **Location:** Guadalajara
+- **Location:** Guadalajara, México
 
 ## Previous Reading
 
@@ -29,13 +29,17 @@ And about What and API, REST API are ?
 ## *R* Requirements
 - Any version its ok.
 - Does not have to be used RStudio or any other GUI for *R*.
-- Following packages will be needed.
+- Following packages will be needed, i just added a code in order to autodetect them and install them if you havent yet
 
 ```r
-library (httr)             # Tools for Working with URLs and HTTP
-library (RCurl)            # General network (HTTP/FTP/...) client interface for R
-library (jsonlite)         # A Robust, High Performance JSON Parser and Generator for R
-library (downloader)       # for downloading files over http and https. (OPTIONAL)
+if (!require(downloader)) install.packages('downloader', quiet = TRUE)
+suppressMessages(library (downloader))   # for downloading files over http and https. (OPTIONAL)
+if (!require(httr))       install.packages('httr', quiet = TRUE)
+suppressMessages(library (httr))         # Tools for Working with URLs and HTTP
+if (!require(jsonlite))   install.packages('jsonlite', quiet = TRUE)
+suppressMessages(library (jsonlite))     # A Robust, High Performance JSON Parser and Generator for R
+if (!require(RCurl))      install.packages('RCurl', quiet = TRUE)
+suppressMessages(library (RCurl))        # General network (HTTP/FTP/...) client interface for R
 ```
 The previous packages are actually necessary not for running the functions, those are regular expressions of R, but when you call and execute them in your code. Thats because some functions i used inside the API.
 
