@@ -80,7 +80,7 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
   Prices        <- data.frame(InstHistPjson[[3]])
   Prices$time <- paste(substr(Prices$time,1,10),substr(Prices$time,12,19), sep=" ")
   colnames(Prices) <- c("TimeStamp","Open","High","Low","Close","TickVolume","Complete")
-  Prices[,1] <- as.POSIXct(PastPriceAPI$TimeStamp,origin="1970-01-01",format="%Y-%M-%d %H:%M:%S")
+  Prices[,1] <- as.POSIXct(Prices$TimeStamp,origin="1970-01-01",format="%Y-%M-%d %H:%M:%S")
   return(Prices)
 }
 
