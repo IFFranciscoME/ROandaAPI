@@ -45,9 +45,9 @@ ActualPrice <- function(AccountType,Token,Instrument){
                   format = "%H:%M:%S")
   Date <- as.character(substr(DateTime,1,10))
   Time <- as.character(substr(DateTime,12,19))
-  DataJSON    <- data.frame(Date,Time,InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
-  DataJSON     <- data.frame(Date,Time,InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
-  colnames(DataJSON) <- c("Date","Time","Bid","Ask")
+  DataJSON    <- data.frame(paste(Date,Time,sep=" "),InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
+  colnames(DataJSON) <- c("TimeStamp","Bid","Ask")
+  DataJSON[,1] <- as.POSIXct(DataJSON$TimeStamp,origin="1970-01-01",format="%Y-%M-%d %H:%M:%S")
   return(DataJSON)
 }
 
@@ -80,6 +80,7 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
   Prices        <- data.frame(InstHistPjson[[3]])
   Prices$time <- paste(substr(Prices$time,1,10),substr(Prices$time,12,19), sep=" ")
   colnames(Prices) <- c("TimeStamp","Open","High","Low","Close","TickVolume","Complete")
+  Prices[,1] <- as.POSIXct(PastPriceAPI$TimeStamp,origin="1970-01-01",format="%Y-%M-%d %H:%M:%S")
   return(Prices)
 }
 
