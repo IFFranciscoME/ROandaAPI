@@ -1,16 +1,10 @@
-# -- Initial Developer: FranciscoME ------------------------------------------------------------------- #
-# -- License: GNU General Public License -------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Initial Developer: FranciscoME ------------------------------------------------------------- #
+# -- GitHub Repossitory: https://github.com/IFFranciscoME/ROandaAPI ----------------------------- #
+# -- License: GNU General Public License -------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
-# List of available instruments ----------------------------------------------------------------------- #
-
-if (!require(downloader)) install.packages('downloader', quiet = TRUE)
-suppressMessages(library (downloader))
-if (!require(httr))       install.packages('httr', quiet = TRUE)
-suppressMessages(library (httr))
-if (!require(jsonlite))   install.packages('jsonlite', quiet = TRUE)
-suppressMessages(library (jsonlite))
-if (!require(RCurl))      install.packages('RCurl', quiet = TRUE)
-suppressMessages(library (RCurl))
+# -- List of available instruments -------------------------------------------------------------- #
 
 InstrumentsList <- function(AccountType,Token,AccountID){
   if(AccountType == "practice"){
@@ -18,7 +12,7 @@ InstrumentsList <- function(AccountType,Token,AccountID){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth       <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp  <- paste(httpaccount,"/v1/instruments?accountId=",sep="")
@@ -29,7 +23,9 @@ InstrumentsList <- function(AccountType,Token,AccountID){
   return(InstJson)
 }
 
-# Actual Price Request -------------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Actual Price Request ----------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 ActualPrice <- function(AccountType,Token,Instrument){
   if(AccountType == "practice"){
@@ -37,7 +33,7 @@ ActualPrice <- function(AccountType,Token,Instrument){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth         <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp    <- paste(httpaccount,"/v1/prices?instruments=",sep="")
@@ -46,13 +42,17 @@ ActualPrice <- function(AccountType,Token,Instrument){
                   package="RCurl"),httpheader=auth)
   InstPrecjson <- fromJSON(InstPrec, simplifyDataFrame = TRUE)
   DateTime     <- as.POSIXct(substr(InstPrecjson[[1]]$time,12,19),
-                  format = "%H:%M:%S") + 6*60*60
-  DataJSON    <- data.frame(DateTime,InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
-  colnames(DataJSON) <- c("Tiempo","Bid","Ask")
+                  format = "%H:%M:%S")
+  Date <- as.character(substr(DateTime,1,10))
+  Time <- as.character(substr(DateTime,12,19))
+  DataJSON    <- data.frame(Date,Time,InstPrecjson[[1]]$bid,InstPrecjson[[1]]$ask)
+  colnames(DataJSON) <- c("Date","Time","Bid","Ask")
   return(DataJSON)
 }
 
-# Historical Prices Request --------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Historical Prices Request ------------------------------------------------------------------ #
+# -- -------------------------------------------------------------------------------------------- #
 
 HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,Instrument){
   if(AccountType == "practice"){
@@ -60,7 +60,7 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
   } else 
     if(AccountType == "live"){
       httpaccount  <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   qcount  <- paste("count=",Count,sep="")
   qcandleFormat  <- "candleFormat=midpoint"
@@ -84,7 +84,9 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
   return(Prices)
 }
 
-# Accounts per given username  ------------------------------------------------------------------------ #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Accounts per given username  --------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 UsersAccounts <- function(AccountType,Token,UserName){
   if(AccountType == "practice"){
@@ -92,7 +94,7 @@ UsersAccounts <- function(AccountType,Token,UserName){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth         <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp  <- paste(httpaccount,"/v1/accounts?username=",sep="")
@@ -103,7 +105,9 @@ UsersAccounts <- function(AccountType,Token,UserName){
   return(InstJson)
 }
 
-# Account Information  -------------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Account Information  ----------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 AccountInfo   <- function(AccountType,AccountID,Token){
   if(AccountType == "practice"){
@@ -111,7 +115,7 @@ AccountInfo   <- function(AccountType,AccountID,Token){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -134,7 +138,9 @@ AccountInfo   <- function(AccountType,AccountID,Token){
   return(datos)
 }
 
-# Actual order in the account ------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Actual order in the account ---------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 AccountOrders  <- function(AccountType,AccountID,Token,Instrument){
   if(AccountType == "practice"){
@@ -142,7 +148,7 @@ AccountOrders  <- function(AccountType,AccountID,Token,Instrument){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -156,7 +162,9 @@ AccountOrders  <- function(AccountType,AccountID,Token,Instrument){
   return(InstJson)
 }
 
-# Place a new order ----------------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Place a new order -------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 NewOrder <- function(AccountType,Token,Instrument,AccountID,Count,Side,OrderType){
   if(AccountType == "practice"){
@@ -164,7 +172,7 @@ NewOrder <- function(AccountType,Token,Instrument,AccountID,Count,Side,OrderType
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth       <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp  <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -176,7 +184,9 @@ NewOrder <- function(AccountType,Token,Instrument,AccountID,Count,Side,OrderType
   opts=list(httpheader=auth,ssl.verifypeer = FALSE))
 }
 
-# Information about a particular order ---------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Information about a particular order ------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 OrderInfo  <- function(AccountType,AccountID,Token,OrderNum){
   if(AccountType == "practice"){
@@ -184,7 +194,7 @@ OrderInfo  <- function(AccountType,AccountID,Token,OrderNum){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -197,7 +207,9 @@ OrderInfo  <- function(AccountType,AccountID,Token,OrderNum){
   return(InstJson)
 }
 
-# List of open trades --------------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- List of open trades ------------------------------------------------------------------------ #
+# -- -------------------------------------------------------------------------------------------- #
 
 OpenTrades  <- function(AccountType,AccountID,Token,Instrument){
   if(AccountType == "practice"){
@@ -205,7 +217,7 @@ OpenTrades  <- function(AccountType,AccountID,Token,Instrument){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -219,7 +231,9 @@ OpenTrades  <- function(AccountType,AccountID,Token,Instrument){
   return(InstJson)
 }
 
-# A particular trade's Information  ------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- A particular trade's Information  ---------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber){
   if(AccountType == "practice"){
@@ -227,7 +241,7 @@ TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -240,7 +254,9 @@ TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber){
   return(InstJson)
 }
 
-# Account's Open Positions List ----------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Account's Open Positions List -------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 AccountPositions  <- function(AccountType,AccountID,Token){
   if(AccountType == "practice"){
@@ -248,7 +264,7 @@ AccountPositions  <- function(AccountType,AccountID,Token){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -260,7 +276,9 @@ AccountPositions  <- function(AccountType,AccountID,Token){
   return(InstJson)
 }
 
-# Position respect a particular instrument ------------------------------------------------------------ #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Position respect a particular instrument --------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument){
   if(AccountType == "practice"){
@@ -268,7 +286,7 @@ InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -281,7 +299,9 @@ InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument){
   return(InstJson)
 }
 
-# Historical of transactions -------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Historical of transactions ----------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Count){
   if(AccountType == "practice"){
@@ -289,7 +309,7 @@ AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Coun
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -304,7 +324,9 @@ AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Coun
   return(InstJson)
 }
 
-# A particular transaction info  --------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- A particular transaction info  ------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 InfoTransaction  <- function(AccountType,AccountID,Token,TransactionNum){
   if(AccountType == "practice"){
@@ -312,7 +334,7 @@ InfoTransaction  <- function(AccountType,AccountID,Token,TransactionNum){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -325,7 +347,9 @@ InfoTransaction  <- function(AccountType,AccountID,Token,TransactionNum){
   return(InstJson)
 }
 
-# General Info about all transactions of the account -------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- General Info about all transactions of the account ----------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 AccountTransactions  <- function(AccountType,AccountID,Token){
   if(AccountType == "practice"){
@@ -333,7 +357,7 @@ AccountTransactions  <- function(AccountType,AccountID,Token){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth        <- c(Authorization = paste("Bearer",Token,sep=" "))
   Queryhttp   <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -345,7 +369,9 @@ AccountTransactions  <- function(AccountType,AccountID,Token){
   return(QueryInst1)
 }
 
-# Economic Calendar ----------------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Economic Calendar -------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 EconomicCalendar <- function(AccountType,Token,Instrument,Period){
   if(AccountType == "practice"){
@@ -353,7 +379,7 @@ EconomicCalendar <- function(AccountType,Token,Instrument,Period){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
   auth1 <- paste("Authorization:",auth,sep=" ")
@@ -372,7 +398,9 @@ EconomicCalendar <- function(AccountType,Token,Instrument,Period){
   return(Calend)
 }
 
-# Historical posistion ratios in OANDA ---------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Historical posistion ratios in OANDA ------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 RatiosPosturas <- function(AccountType,Token,Instrument,Period){
   if(AccountType == "practice"){
@@ -380,7 +408,7 @@ RatiosPosturas <- function(AccountType,Token,Instrument,Period){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
   auth1 <- paste("Authorization:",auth,sep=" ")
@@ -397,7 +425,9 @@ RatiosPosturas <- function(AccountType,Token,Instrument,Period){
   return(ratios)
 }
 
-# Current OANDA's Clients Spreads --------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Current OANDA's Clients Spreads ------------------------------------------------------------ #
+# -- -------------------------------------------------------------------------------------------- #
 
 Spreads <- function(AccountType,Token,Instrument,Period){
   if(AccountType == "practice"){
@@ -405,7 +435,7 @@ Spreads <- function(AccountType,Token,Instrument,Period){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
   auth1 <- paste("Authorization:",auth,sep=" ")
@@ -421,7 +451,9 @@ Spreads <- function(AccountType,Token,Instrument,Period){
   return(spread)
 }
 
-# Commitment Of Traders ------------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Commitment Of Traders ---------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 COT <- function(AccountType,Token,Instrument){
   if(AccountType == "practice"){
@@ -429,7 +461,7 @@ COT <- function(AccountType,Token,Instrument){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
   auth1 <- paste("Authorization:",auth,sep=" ")
@@ -441,7 +473,9 @@ COT <- function(AccountType,Token,Instrument){
   return(Cot)
 }
 
-# Order Book ------------------------------------------------------------------------------------------ #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Order Book --------------------------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 OrderBook <- function(AccountType,Token,Instrument,Period){
   if(AccountType == "practice"){
@@ -449,7 +483,7 @@ OrderBook <- function(AccountType,Token,Instrument,Period){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
   auth1 <- paste("Authorization:",auth,sep=" ") 
@@ -465,7 +499,9 @@ OrderBook <- function(AccountType,Token,Instrument,Period){
   return(orderbook)
 }
 
-# Autochartist "Our Favorites" Signals ---------------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
+# -- Autochartist "Our Favorites" Signals ------------------------------------------------------- #
+# -- -------------------------------------------------------------------------------------------- #
 
 Autochartist <- function(AccountType,Token,Instrument,Period,Type){
   if(AccountType == "practice"){
@@ -473,7 +509,7 @@ Autochartist <- function(AccountType,Token,Instrument,Period,Type){
   } else 
     if(AccountType == "live"){
       httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error")
+    } else print("Account type error. Must be practice or live")
   
   auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
   auth1 <- paste("Authorization:",auth,sep=" ")
@@ -491,12 +527,12 @@ Autochartist <- function(AccountType,Token,Instrument,Period,Type){
   return(Autochart)
 }
 
-# PENDING Modify parameters of an order ------------------------------------------------------------- #
+# -- PENDING Close an order --------------------------------------------------------------------- #
 
-# PENDING Close an order -..------------------------------------------------------------------------- #
+# -- PENDING Close a trade ---------------------------------------------------------------------- #
 
-# PENDING Modify parameters of a trade -------------------------------------------------------------- #
+# -- PENDING Close existing position ------------------------------------------------------------ #
 
-# PENDING Close a trade ----------------------------------------------------------------------------- #
+# -- PENDING Modify parameters of an order ------------------------------------------------------ #
 
-# PENDING Close existing position ------------------------------------------------------------------- #
+# -- PENDING Modify parameters of a trade ------------------------------------------------------- #
