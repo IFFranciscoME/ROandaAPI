@@ -78,10 +78,8 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
                package="RCurl"),httpheader=auth)
   InstHistPjson <- fromJSON(InstHistP, simplifyDataFrame = TRUE)
   Prices        <- data.frame(InstHistPjson[[3]])
-  Prices$Times  <- substr(Prices$time,12,19)
-  Prices$Dates  <- substr(Prices$time,1,10)
-  Prices <- cbind(Prices$Dates,Prices$Times,Prices[,2:7])
-  colnames(Prices) <- c("Date","Time","Open","High","Low","Close","TickVolume","Complete")
+  Prices$time <- paste(substr(Prices$time,1,10),substr(Prices$time,12,19), sep=" ")
+  colnames(Prices) <- c("TimeStamp","Open","High","Low","Close","TickVolume","Complete")
   return(Prices)
 }
 
