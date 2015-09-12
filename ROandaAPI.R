@@ -55,7 +55,7 @@ ActualPrice <- function(AccountType,Token,Instrument){
 # -- Historical Prices Request ------------------------------------------------------------------ #
 # -- -------------------------------------------------------------------------------------------- #
 
-HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,Instrument){
+HisPrices  <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,Start,End){
   if(AccountType == "practice"){
     httpaccount  <- "https://api-fxpractice.oanda.com"
   } else 
@@ -63,7 +63,11 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
       httpaccount  <- "https://api-fxtrade.oanda.com"
     } else print("Account type error. Must be practice or live")
   
-  qcount  <- paste("count=",Count,sep="")
+  #ifelse(Count = is.NULL, qcount  <- paste("count=",Count,sep=""), break)
+  
+  qstart <- paste("start=",Start,sep="")
+  qend   <- paste("end=",End,sep="")
+  
   qcandleFormat  <- "candleFormat=midpoint"
   qgranularity   <- paste("granularity=",Granularity,sep="")
   qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
@@ -72,7 +76,7 @@ HisPrices  <- function(AccountType,Count,Granularity,DayAlign,TimeAlign,Token,In
   auth           <- c(Authorization = paste("Bearer",Token,sep=" "))
   QueryHistPrec  <- paste(httpaccount,"/v1/candles?instrument=",sep="")
   QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
-  QueryHistPrec2 <- paste(QueryHistPrec1,qcount,qcandleFormat,qgranularity,
+  QueryHistPrec2 <- paste(QueryHistPrec1,qstart,qend,qcandleFormat,qgranularity,
                     qdailyalignment,qalignmentTimezone,sep="&")
   InstHistP <- getURL(QueryHistPrec2,cainfo=system.file("CurlSSL","cacert.pem",
                package="RCurl"),httpheader=auth)
