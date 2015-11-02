@@ -62,31 +62,25 @@ OANDA has a dedicated page to provide all sort of help and examples for develope
 Minimal example to fetch instrument list and from one of them the past prices
 
 ```r
-AccountID    <- 1234567
-AccountType  <- "practice"
-Granularity  <- "H6"
-DayAlign     <- 0
-TimeAlign    <- "America%2FMexico_City"
-Token        <- # Your Token
+AccountID   <- 1234567
+AccountType <- "practice"
+Granularity <- "H6"
+DayAlign    <- 0
+TimeAlign   <- "America%2FMexico_City"
+Token       <- # Your Token
+ResagosMax  <- 100
+NC    <- .99
 Start <- "2015-01-01"
 End   <- "2015-10-01"
 
 ListaInst   <- data.frame(InstrumentsList(AccTp,Token,AccID))[,c(1,3)]
 TInst <- ListaInst[117,1]
 PreciosHist <- HisPrices(AccTp,Gran,DayAlign,TimeAlign,Token,TInst,FIni,FFin)
-PrecioAct   <- ActualPrice(AccTp,Token,TInst)
 PrecioCl    <- data.frame(PreciosHist$TimeStamp, round(PreciosHist$Close,4))
 colnames(PrecioCl) <- c("TimeStamp","PrecioCl")
-```
-
-```r
-ResagosMax  <- 100
-NC  <- .99
-InitialBalance <- 10000
 
 Entrenamiento <- trunc(length(PrecioCl[,1])*.85)
 PrecioClEnt   <- PrecioCl[1:Entrenamiento,]
-PrecioClVal   <- na.omit(PrecioCl[Entrenamiento+1:length(PrecioCl[,1]),])
 PrecioClVal   <- data.frame(PrecioClVal$TimeStamp, round(PrecioClVal$PrecioCl,4))
 colnames(PrecioClVal) <-c("TimeStamp","PrecioCl")
 
