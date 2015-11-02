@@ -57,3 +57,22 @@ OANDA has a dedicated page to provide all sort of help and examples for develope
 - [Troubleshooting](http://developer.oanda.com/rest-live/troubleshooting-errors/) Breath and then Read
 - [Sample Codes](http://developer.oanda.com/rest-live/sample-code/) So this actually works, huh?
 - [Interactive Console](http://developer.oanda.com/rest-practice/console/) Try before implement
+
+## Minimal Example
+Minimal example to fetch instrument list and from one of them the past prices
+
+```r
+AccountID    <- 1234567
+AccountType  <- "practice"
+Granularity  <- "H6"
+DayAlign     <- 0
+TimeAlign    <- "America%2FMexico_City"
+Token        <- # Your Token
+Start <- "2015-01-01"
+End   <- "2015-10-01"
+InstList     <- data.frame(InstrumentsList(AccountType,Token,AccountID))[,c(1,3)]
+Instrument   <- InstList[117,1]
+PastPriceAPI <- HisPrices(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,Start,End)
+```
+
+
