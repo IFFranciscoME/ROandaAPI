@@ -61,6 +61,23 @@ OANDA has a dedicated page to provide all sort of help and examples for develope
 ## Minimal Example
 Minimal example to fetch instrument list and from one of them the past prices
 
+### Install Required Libraries
+
+```r
+rm(list=ls())
+cat("\014")
+
+Pkg <- c("base","downloader","forecast","httr","jsonlite","lubridate","moments",
+"PerformanceAnalytics","quantmod","reshape2","RCurl","stats","scales","tseries",
+"TTR","TSA","xts","zoo")
+
+inst <- Pkg %in% installed.packages()
+if(length(Pkg[!inst]) > 0) install.packages(Pkg[!inst])
+instpackages <- lapply(Pkg, library, character.only=TRUE)
+```
+
+### Initial Parameters
+
 ```r
 AccountID   <- 1234567
 AccountType <- "practice"
