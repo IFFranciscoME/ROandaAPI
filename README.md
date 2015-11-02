@@ -70,7 +70,7 @@ TimeAlign   <- "America%2FMexico_City"
 Token       <- # Your Token
 ResagosMax  <- 100
 NC    <- .99
-Start <- "2015-01-01"
+Start <- "2014-01-01"
 End   <- "2015-10-01"
 
 ListaInst   <- data.frame(InstrumentsList(AccTp,Token,AccID))[,c(1,3)]
