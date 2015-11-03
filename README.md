@@ -26,28 +26,6 @@ And about What and API, REST API are ?
 
 3. **Save Info Safely:** Having that *Token* is like having your password, so keep it safe. If you ever lost it or need to change it, its ok and the previous one goes deprecated as soon as you generate another one, so you can *Revoke* it whenever you want.
 
-## *R* Requirements
-- Any version its ok.
-- Does not have to be used RStudio or any other GUI for *R*.
-- Following packages will be needed, i just added a code in order to autodetect them and install them if you havent yet
-
-```r
-if (!require(downloader)) install.packages('downloader', quiet = TRUE)
-suppressMessages(library (downloader))   # for downloading files over http and https. (OPTIONAL)
-if (!require(httr))       install.packages('httr', quiet = TRUE)
-suppressMessages(library (httr))         # Tools for Working with URLs and HTTP
-if (!require(jsonlite))   install.packages('jsonlite', quiet = TRUE)
-suppressMessages(library (jsonlite))     # A Robust, High Performance JSON Parser and Generator for R
-if (!require(RCurl))      install.packages('RCurl', quiet = TRUE)
-suppressMessages(library (RCurl))        # General network (HTTP/FTP/...) client interface for R
-```
-The previous packages are actually necessary not for running the functions, those are regular expressions of R, but when you call and execute them in your code. Thats because some functions i used inside the API.
-
-in case you prefer have access to this API with one line of code, you can use the following and the functions will available locally *(Note: You must run this code every time you begin R Session).*
-
-```r
-downloader::source_url("http://bit.ly/GitHubROandaAPI",prompt=FALSE,quiet=TRUE)
-```
 ## More Official Resources
 
 OANDA has a dedicated page to provide all sort of help and examples for developers, in many languages, you can always go there and consider have a resource full place for you Algorithmic Trading.
@@ -58,15 +36,20 @@ OANDA has a dedicated page to provide all sort of help and examples for develope
 - [Sample Codes](http://developer.oanda.com/rest-live/sample-code/) So this actually works, huh?
 - [Interactive Console](http://developer.oanda.com/rest-practice/console/) Try before implement
 
-## Minimal Example
-Minimal example to fetch instrument list and from one of them the past prices
+## *R* Requirements
+- Any version its ok.
+- Does not have to be used RStudio or any other GUI for *R*.
+- Specific packages will be needed, i just added a code in order to autodetect them and install them if you havent yet
 
-### Install Required Libraries
+The previous packages are actually necessary not for running the functions, those are regular expressions of R, but when you call and execute them in your code. Thats because some functions i used inside the API. in case you prefer have access to this API with one line of code, you can use the following and the functions will available locally *(Note: You must run this code every time you begin R Session).*
+
+## Step by Step for Minimal Example
+
+### 1. Install Required Libraries
+
+Install required libraries if not already installed, if they are installed just load them.
 
 ```r
-rm(list=ls())
-cat("\014")
-
 Pkg <- c("base","downloader","forecast","httr","jsonlite","lubridate","moments",
 "PerformanceAnalytics","quantmod","reshape2","RCurl","stats","scales","tseries",
 "TTR","TSA","xts","zoo")
@@ -76,32 +59,38 @@ if(length(Pkg[!inst]) > 0) install.packages(Pkg[!inst])
 instpackages <- lapply(Pkg, library, character.only=TRUE)
 ```
 
-### Initial Parameters
+### 2. Load in local environment the ROandaAPI Code
+
+Uses the function *source_url* from the package **downloader** to source a R script located in a *GitHub* repository.
 
 ```r
-AccountID   <- 1234567
-AccountType <- "practice"
-Granularity <- "H6"
-DayAlign    <- 0
-TimeAlign   <- "America%2FMexico_City"
-Token       <- # Your Token
-ResagosMax  <- 100
-NC    <- .99
-Start <- "2014-01-01"
-End   <- "2015-10-01"
-
-ListaInst   <- data.frame(InstrumentsList(AccTp,Token,AccID))[,c(1,3)]
-TInst <- ListaInst[117,1]
-PreciosHist <- HisPrices(AccTp,Gran,DayAlign,TimeAlign,Token,TInst,FIni,FFin)
-PrecioCl    <- data.frame(PreciosHist$TimeStamp, round(PreciosHist$Close,4))
-colnames(PrecioCl) <- c("TimeStamp","PrecioCl")
-
-Entrenamiento <- trunc(length(PrecioCl[,1])*.85)
-PrecioClEnt   <- PrecioCl[1:Entrenamiento,]
-PrecioClVal   <- data.frame(PrecioClVal$TimeStamp, round(PrecioClVal$PrecioCl,4))
-colnames(PrecioClVal) <-c("TimeStamp","PrecioCl")
-
-ResagosCl <- data.frame(cbind(PrecioClEnt[,1:2],Lag(x=PrecioClEnt$PrecioCl,k=1:ResagosMax)))
-ResagosCl <- ResagosCl[-c(1:ResagosMax),]
+downloader::source_url("http://bit.ly/GitHubROandaAPI",prompt=FALSE,quiet=TRUE)
 ```
+
+### 3. Data Inputs
+
+**AccountID** is a 7 digit number, the input must be numeric, **Token** is where yours go, and the **Start** and **End** are dates in format *"YYYY-MM-DD".
+
+```r
+AccountType <- "practice"
+AccountID   <- 1234567
+Token       <- "ba207fab3522f33fda6a91dbfee0522f6-cdbba372874e6e69e4694f050f890277"
+TimeAlign   <- "America%2FMexico_City"
+Granularity <- "H6"
+Start <- "2015-01-01"
+End   <- "2015-10-01"
+```
+
+### 4. Two Functions as an example
+
+**InstList** in order to get the available instruments in *Oanda* , and **HisPrices*** to get the historical prices of the selected instrument, in this case the 117th so is the *XAU_USD*, that is Gold Vs Usd.
+
+```r
+InstList     <- data.frame(InstrumentsList(AccountType,Token,AccountID))[,c(1,3)]
+Instrument   <- InstList[117,1]
+PastPriceAPI <- HisPrices(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,Start,End)
+```
+
+
+
 
