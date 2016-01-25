@@ -148,7 +148,7 @@ AccountInfo   <- function(AccountType,AccountID,Token) {
 }
 
 # -- --------------------------------------------------------------------------------- #
-# -- Actual order in the account ----------------------------------------------------- #
+# -- Actual orders in the account ----------------------------------------------------- #
 # -- --------------------------------------------------------------------------------- #
 
 AccountOrders  <- function(AccountType,AccountID,Token,Instrument) {
@@ -175,7 +175,8 @@ AccountOrders  <- function(AccountType,AccountID,Token,Instrument) {
 # -- Place a new order --------------------------------------------------------------- #
 # -- --------------------------------------------------------------------------------- #
 
-NewOrder <- function(AccountType,Token,Instrument,AccountID,Count,Side,OrderType) {
+NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side,
+                     Expiry, Price, SL, TP, TS) {
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -188,11 +189,104 @@ NewOrder <- function(AccountType,Token,Instrument,AccountID,Count,Side,OrderType
   Queryhttp1 <- paste(Queryhttp,AccountID,sep="")
   Queryhttp2 <- paste(Queryhttp1,"/orders",sep="")
   
-  PF <- postForm(Queryhttp2,style="POST",
-          .params=c(instrument=Instrument,units=Count,side=Side,type=OrderType),
+  if(OrderType == 'market'){
+    Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType)
+  } else  if(OrderType == 'limit'){
+    Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType,
+               price=Price, expiry=Expiry, stopLoss=SL, takeProfit=TP, trailingStop=TS)
+  } else  if(OrderType == 'stop'){
+    Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType,
+               price=Price, stopLoss=SL, takeProfit=TP, expiry=Expiry, trailingStop=TS)
+  } else  if(OrderType == 'marketIfTouched'){
+    Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType,
+               price=Price, stopLoss=SL, takeProfit=TP, expiry=Expiry, trailingStop=TS)
+  } else print("Order Type error. Must be: 'market', 'limit', 'stop', 'marketIfTouched'")
+
+  PF <- postForm(Queryhttp2, style="POST", .params=Param,
           .opts=list(httpheader=auth,ssl.verifypeer = TRUE))
+  
   InstJson <- fromJSON(PF, simplifyDataFrame = TRUE)
   return(InstJson)
+}
+
+# -- --------------------------------------------------------------------------------- #
+# -- Close an order ------------------------------------------------------------------ #
+# -- --------------------------------------------------------------------------------- #
+
+CloseOrder <- function(AccountType, AccountID, Token, OrderID) {
+  
+  if(AccountType == "practice") {
+    httpaccount <- "https://api-fxpractice.oanda.com"
+  } else 
+    if(AccountType == "live") {
+      httpaccount <- "https://api-fxtrade.oanda.com"
+    } else print("Account type error. Must be practice or live")
+  
+  Queryhttp  <- paste(httpaccount,"/v1/accounts/", sep = "")
+  Queryhttp1 <- paste(Queryhttp,AccountID, sep = "")
+  Queryhttp2 <- paste(Queryhttp1,"/orders/", sep = "")
+  Queryhttp3 <- paste(Queryhttp2,OrderID, sep = "")
+  
+  auth  <- c(Authorization = paste("Authorization: Bearer",Token, sep=" "))
+  
+  DELETEOrder <- httpDELETE(Queryhttp3, cainfo=system.file("CurlSSL","cacert.pem",
+  package="RCurl"), httpheader=auth)
+  
+  return(DELETEOrder)
+}
+
+# -- --------------------------------------------------------------------------------- #
+# -- Modify parameters of an order --------------------------------------------------- #
+# -- --------------------------------------------------------------------------------- #
+
+ModifyOrder <- function(AccountType, AccountID, Token, OrderID, Units, Price,
+                        Expiry, StopLoss, TakeProfit, TrailingStop) {
+  
+  if(AccountType == "practice") {
+    httpaccount <- "https://api-fxpractice.oanda.com"
+  } else 
+    if(AccountType == "live") {
+      httpaccount <- "https://api-fxtrade.oanda.com"
+    } else print("Account type error. Must be practice or live")
+  
+  Queryhttp  <- paste(httpaccount,"/v1/accounts/", sep = "")
+  Queryhttp1 <- paste(Queryhttp,AccountID, sep = "")
+  Queryhttp2 <- paste(Queryhttp1,"/orders/", sep = "")
+  Queryhttp3 <- paste(Queryhttp2,OrderID, sep = "")
+  
+  auth  <- c(Authorization = paste("Authorization: Bearer",Token, sep=" "))
+  Param <- c(units=Units, price=Price, expiry=Expiry, stopLoss=StopLoss, 
+             takeProfit=TakeProfit, trailingStop=TrailingStop)
+             
+  PatchModifyOrder <- httpOPTIONS(Queryhttp3, cainfo=system.file("CurlSSL","cacert.pem",
+                                        package="RCurl"), httpheader=auth,.params=Param)
+  return(PatchModifyOrder)
+}
+
+# -- --------------------------------------------------------------------------------- #
+# -- Order Book ---------------------------------------------------------------------- #
+# -- --------------------------------------------------------------------------------- #
+
+OrderBook <- function(AccountType,Token,Instrument,Period) {
+  if(AccountType == "practice"){
+    httpaccount <- "https://api-fxpractice.oanda.com"
+  } else 
+    if(AccountType == "live"){
+      httpaccount <- "https://api-fxtrade.oanda.com"
+    } else print("Account type error. Must be practice or live")
+  
+  auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
+  auth1 <- paste("Authorization:",auth,sep=" ") 
+  
+  Queryhttp  <- paste(httpaccount,"/labs/v1/orderbook_data?instrument=",sep="")
+  Queryhttp1 <- paste(Queryhttp,Instrument,sep="")
+  Queryhttp2 <- paste(Queryhttp1,"period=",sep="&")  
+  Queryhttp3 <- paste(Queryhttp2,Period,sep="")  
+  
+  orderbook  <- getURL(Queryhttp3,cainfo=system.file("CurlSSL",
+                                                     "cacert.pem",package="RCurl"),httpheader=auth)
+  orderbook  <- fromJSON(orderbook)
+  return(orderbook)
 }
 
 # -- --------------------------------------------------------------------------------- #
@@ -265,6 +359,8 @@ TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber) {
   return(InstJson)
 }
 
+# -- PENDING Modify parameters of a trade -------------------------------------------- #
+
 # -- --------------------------------------------------------------------------------- #
 # -- Account's Open Positions List --------------------------------------------------- #
 # -- --------------------------------------------------------------------------------- #
@@ -309,6 +405,8 @@ InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument) {
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
   return(InstJson)
 }
+
+# -- PENDING Close existing position ------------------------------------------------- #
 
 # -- --------------------------------------------------------------------------------- #
 # -- Historical of transactions ------------------------------------------------------ #
@@ -485,32 +583,6 @@ COT <- function(AccountType,Token,Instrument) {
 }
 
 # -- --------------------------------------------------------------------------------- #
-# -- Order Book ---------------------------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
-
-OrderBook <- function(AccountType,Token,Instrument,Period) {
-  if(AccountType == "practice"){
-    httpaccount <- "https://api-fxpractice.oanda.com"
-  } else 
-    if(AccountType == "live"){
-      httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error. Must be practice or live")
-  
-  auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
-  auth1 <- paste("Authorization:",auth,sep=" ") 
-  
-  Queryhttp  <- paste(httpaccount,"/labs/v1/orderbook_data?instrument=",sep="")
-  Queryhttp1 <- paste(Queryhttp,Instrument,sep="")
-  Queryhttp2 <- paste(Queryhttp1,"period=",sep="&")  
-  Queryhttp3 <- paste(Queryhttp2,Period,sep="")  
-  
-  orderbook  <- getURL(Queryhttp3,cainfo=system.file("CurlSSL",
-                "cacert.pem",package="RCurl"),httpheader=auth)
-  orderbook  <- fromJSON(orderbook)
-  return(orderbook)
-}
-
-# -- --------------------------------------------------------------------------------- #
 # -- Autochartist "Our Favorites" Signals -------------------------------------------- #
 # -- --------------------------------------------------------------------------------- #
 
@@ -533,52 +605,7 @@ Autochartist <- function(AccountType,Token,Instrument,Period,Type) {
   Queryhttp5 <- paste(Queryhttp4,Type,sep="")
   
   Autochart  <- getURL(Queryhttp5,cainfo=system.file("CurlSSL",
-                "cacert.pem",package="RCurl"),httpheader=auth)
+                                                     "cacert.pem",package="RCurl"),httpheader=auth)
   Autochart  <- fromJSON(Autochart)
   return(Autochart)
 }
-
-# -- PENDING Close an order ---------------------------------------------------------- #
-
-CloseOrder <- function(AccountType, AccountID, Token, OrderID) {
-  
-  AccountType <- "practice"
-  AccountID   <- 1438853
-  Token   <- "c567fab3522f33fda6a91dbfee0522f6-cdbba372874e6e69e4694f050f890273"
-  OrderID <- 7777
-  
-  if(AccountType == "practice") {
-    httpaccount <- "https://api-fxpractice.oanda.com"
-  } else 
-  if(AccountType == "live") {
-    httpaccount <- "https://api-fxtrade.oanda.com"
-  } else print("Account type error. Must be practice or live")
-
-  Queryhttp  <- paste(httpaccount,"/v1/accounts/", sep = "")
-  Queryhttp1 <- paste(Queryhttp,AccountID, sep = "")
-  Queryhttp2 <- paste(Queryhttp1,"/orders/", sep = "")
-  Queryhttp3 <- paste(Queryhttp2,OrderID, sep = "")
-  
-  auth  <- c(Authorization = paste("Bearer",Token, sep=" "))
-  auth1 <- paste("Authorization:",auth, sep=" ")
-  
-  DELETEOrder <- httpDELETE(Queryhttp3, cainfo=system.file("CurlSSL","cacert.pem",
-  package="RCurl"), httpheader=auth)
-  
-  return(CloseO) }
-
-AccountType <- "practice"
-DayAlign    <- 0
-TimeAlign   <- "America%2FMexico_City"
-Token       <- "c567fab3522f33fda6a91dbfee0522f6-cdbba372874e6e69e4694f050f890273"
-AccountID   <- 1438853
-
-CloseOrder(AccountType, AccountID, Token, OrderID)
-
-# -- PENDING Close a trade ----------------------------------------------------------- #
-
-# -- PENDING Close existing position ------------------------------------------------- #
-
-# -- PENDING Modify parameters of an order ------------------------------------------- #
-
-# -- PENDING Modify parameters of a trade -------------------------------------------- #
