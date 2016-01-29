@@ -1,13 +1,13 @@
 
-# -- --------------------------------------------------------------------------------- #
-# -- Initial Developer: FranciscoME -------------------------------------------------- #
-# -- GitHub Repossitory: http://bit.ly/GitHubROandaAPI ------------------------------- #
-# -- License: GNU General Public License --------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Initial Developer: FranciscoME ----------------------------------------------- -- #
+# -- GitHub Repossitory: http://bit.ly/GitHubROandaAPI ---------------------------- -- #
+# -- License: GNU General Public License ------------------------------------------ -- #
+# -- ------------------------------------------------------------------------------ -- #
 
-# -- --------------------------------------------------------------------------------- #
-# -- List of available instruments --------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- List of available instruments ------------------------------------------------ -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 InstrumentsList <- function(AccountType,Token,AccountID) {
   if(AccountType == "practice"){
@@ -26,9 +26,9 @@ InstrumentsList <- function(AccountType,Token,AccountID) {
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Actual Price Request ------------------------------------------------------------ #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Actual Price Request --------------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 ActualPrice <- function(AccountType,Token,Instrument) {
   if(AccountType == "practice"){
@@ -55,9 +55,9 @@ ActualPrice <- function(AccountType,Token,Instrument) {
   return(DataJSON)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Historical Prices Request ------------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Historical Prices Request ---------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 HisPrices <- function(AccountType,Granularity,DayAlign,TimeAlign,
                        Token,Instrument,Start,End) {
@@ -93,9 +93,9 @@ HisPrices <- function(AccountType,Granularity,DayAlign,TimeAlign,
   return(Prices)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Accounts per given username  ---------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Accounts per given username  ------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 UsersAccounts <- function(AccountType,Token,UserName) {
   if(AccountType == "practice"){
@@ -114,9 +114,9 @@ UsersAccounts <- function(AccountType,Token,UserName) {
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Account Information  ------------------------------------------------------------ #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Account Information  --------------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 AccountInfo   <- function(AccountType,AccountID,Token) {
   if(AccountType == "practice"){
@@ -147,9 +147,9 @@ AccountInfo   <- function(AccountType,AccountID,Token) {
   return(datos)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Actual orders in the account ----------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Actual orders in the account ------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 AccountOrders  <- function(AccountType,AccountID,Token,Instrument) {
   if(AccountType == "practice"){
@@ -171,9 +171,9 @@ AccountOrders  <- function(AccountType,AccountID,Token,Instrument) {
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Place a new order --------------------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Place a new order ------------------------------------------------------------ -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side,
                      Expiry, Price, SL, TP, TS) {
@@ -190,7 +190,8 @@ NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side
   Queryhttp2 <- paste(Queryhttp1,"/orders",sep="")
   
   if(OrderType == 'market'){
-    Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType)
+    Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType,
+               price=Price, expiry=Expiry, stopLoss=SL, takeProfit=TP, trailingStop=TS)
   } else  if(OrderType == 'limit'){
     Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType,
                price=Price, expiry=Expiry, stopLoss=SL, takeProfit=TP, trailingStop=TS)
@@ -209,9 +210,9 @@ NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Close an order ------------------------------------------------------------------ #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Close an order --------------------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 CloseOrder <- function(AccountType, AccountID, Token, OrderID) {
   
@@ -235,9 +236,9 @@ CloseOrder <- function(AccountType, AccountID, Token, OrderID) {
   return(DELETEOrder)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Modify parameters of an order --------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Modify parameters of an order ------------------------------------------------ -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 ModifyOrder <- function(AccountType, AccountID, Token, OrderID, Units, Price,
                         Expiry, StopLoss, TakeProfit, TrailingStop) {
@@ -263,9 +264,9 @@ ModifyOrder <- function(AccountType, AccountID, Token, OrderID, Units, Price,
   return(PatchModifyOrder)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Order Book ---------------------------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Order Book ------------------------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 OrderBook <- function(AccountType,Token,Instrument,Period) {
   if(AccountType == "practice"){
@@ -284,14 +285,14 @@ OrderBook <- function(AccountType,Token,Instrument,Period) {
   Queryhttp3 <- paste(Queryhttp2,Period,sep="")  
   
   orderbook  <- getURL(Queryhttp3,cainfo=system.file("CurlSSL",
-                                                     "cacert.pem",package="RCurl"),httpheader=auth)
+  "cacert.pem",package="RCurl"),httpheader=auth)
   orderbook  <- fromJSON(orderbook)
   return(orderbook)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Information about a particular order -------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Information about a particular order ----------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 OrderInfo  <- function(AccountType,AccountID,Token,OrderNum) {
   if(AccountType == "practice"){
@@ -312,9 +313,9 @@ OrderInfo  <- function(AccountType,AccountID,Token,OrderNum) {
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- List of open trades ------------------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- List of open trades ---------------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 OpenTrades  <- function(AccountType,AccountID,Token,Instrument) {
   if(AccountType == "practice"){
@@ -336,9 +337,9 @@ OpenTrades  <- function(AccountType,AccountID,Token,Instrument) {
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- A particular trade's Information  ----------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- A particular trade's Information  -------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber) {
   if(AccountType == "practice"){
@@ -359,11 +360,9 @@ TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber) {
   return(InstJson)
 }
 
-# -- PENDING Modify parameters of a trade -------------------------------------------- #
-
-# -- --------------------------------------------------------------------------------- #
-# -- Account's Open Positions List --------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Account's Open Positions List ------------------------------------------------ -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 AccountPositions <- function(AccountType,AccountID,Token) {
   if(AccountType == "practice"){
@@ -383,9 +382,9 @@ AccountPositions <- function(AccountType,AccountID,Token) {
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Position respect a particular instrument ---------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Position respect a particular instrument ------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument) {
   if(AccountType == "practice"){
@@ -406,11 +405,9 @@ InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument) {
   return(InstJson)
 }
 
-# -- PENDING Close existing position ------------------------------------------------- #
-
-# -- --------------------------------------------------------------------------------- #
-# -- Historical of transactions ------------------------------------------------------ #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Historical of transactions --------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Count) {
   if(AccountType == "practice"){
@@ -433,9 +430,9 @@ AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Coun
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- A particular transaction info  -------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- A particular transaction info  ----------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 InfoTransaction <- function(AccountType,AccountID,Token,TransactionNum) {
   if(AccountType == "practice"){
@@ -456,9 +453,9 @@ InfoTransaction <- function(AccountType,AccountID,Token,TransactionNum) {
   return(InstJson)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- General Info about all transactions of the account ------------------------------ #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- General Info about all transactions of the account --------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 AccountTransactions  <- function(AccountType,AccountID,Token) {
   if(AccountType == "practice"){
@@ -478,9 +475,9 @@ AccountTransactions  <- function(AccountType,AccountID,Token) {
   return(QueryInst1)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Economic Calendar --------------------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Economic Calendar ------------------------------------------------------------ -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 EconomicCalendar <- function(AccountType,Token,Instrument,Period) {
   if(AccountType == "practice"){
@@ -507,9 +504,9 @@ EconomicCalendar <- function(AccountType,Token,Instrument,Period) {
   return(Calend)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Historical posistion ratios in OANDA -------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Historical posistion ratios in OANDA ----------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 RatiosPosturas  <- function(AccountType,Token,Instrument,Period) {
   if(AccountType == "practice"){
@@ -534,9 +531,9 @@ RatiosPosturas  <- function(AccountType,Token,Instrument,Period) {
   return(ratios)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Current OANDA's Clients Spreads ------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Current OANDA's Clients Spreads ---------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 Spreads <- function(AccountType,Token,Instrument,Period) {
   if(AccountType == "practice"){
@@ -560,9 +557,9 @@ Spreads <- function(AccountType,Token,Instrument,Period) {
   return(spread)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Commitment Of Traders ----------------------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Commitment Of Traders -------------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 COT <- function(AccountType,Token,Instrument) {
   if(AccountType == "practice"){
@@ -582,9 +579,9 @@ COT <- function(AccountType,Token,Instrument) {
   return(Cot)
 }
 
-# -- --------------------------------------------------------------------------------- #
-# -- Autochartist "Our Favorites" Signals -------------------------------------------- #
-# -- --------------------------------------------------------------------------------- #
+# -- ------------------------------------------------------------------------------ -- #
+# -- Autochartist "Our Favorites" Signals ----------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
 
 Autochartist <- function(AccountType,Token,Instrument,Period,Type) {
   if(AccountType == "practice"){
@@ -605,7 +602,33 @@ Autochartist <- function(AccountType,Token,Instrument,Period,Type) {
   Queryhttp5 <- paste(Queryhttp4,Type,sep="")
   
   Autochart  <- getURL(Queryhttp5,cainfo=system.file("CurlSSL",
-                                                     "cacert.pem",package="RCurl"),httpheader=auth)
+  "cacert.pem",package="RCurl"),httpheader=auth)
   Autochart  <- fromJSON(Autochart)
   return(Autochart)
+}
+
+# -- ------------------------------------------------------------------------------ -- #
+# -- Close existing position ------------------------------------------------------ -- #
+# -- ------------------------------------------------------------------------------ -- #
+
+ClosePosition <- function(AccountType, AccountID, Token, Inst) {
+  
+  if(AccountType == "practice") {
+    httpaccount <- "https://api-fxpractice.oanda.com"
+  } else 
+    if(AccountType == "live") {
+      httpaccount <- "https://api-fxtrade.oanda.com"
+    } else print("Account type error. Must be practice or live")
+  
+  Queryhttp  <- paste(httpaccount,"/v1/accounts/", sep = "")
+  Queryhttp1 <- paste(Queryhttp,AccountID, sep = "")
+  Queryhttp2 <- paste(Queryhttp1,"/positions/", sep = "")
+  Queryhttp3 <- paste(Queryhttp2,Inst, sep = "")
+  
+  auth  <- c(Authorization = paste("Authorization: Bearer",Token, sep=" "))
+  
+  DELETEPosition <- httpDELETE(Queryhttp3, cainfo=system.file("CurlSSL","cacert.pem",
+  package="RCurl"), httpheader=auth)
+  
+  return(DELETEPosition)
 }
