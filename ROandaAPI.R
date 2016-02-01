@@ -190,8 +190,8 @@ NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side
   Queryhttp2 <- paste(Queryhttp1,"/orders",sep="")
   
   if(OrderType == 'market'){
-    Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType,
-               price=Price, expiry=Expiry, stopLoss=SL, takeProfit=TP, trailingStop=TS)
+    Param <- c(instrument=Instrument, units=Count, side=Side, type=OrderType,
+               stopLoss=SL, takeProfit=TP, trailingStop=TS)
   } else  if(OrderType == 'limit'){
     Param <- c(instrument=Instrument,units=Count,side=Side,type=OrderType,
                price=Price, expiry=Expiry, stopLoss=SL, takeProfit=TP, trailingStop=TS)
