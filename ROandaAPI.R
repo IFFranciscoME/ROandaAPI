@@ -9,7 +9,9 @@
 # -- List of available instruments ------------------------------------------------ -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-InstrumentsList <- function(AccountType,Token,AccountID) {
+InstrumentsList <- function(AccountType,Token,AccountID)
+{
+
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -22,15 +24,20 @@ InstrumentsList <- function(AccountType,Token,AccountID) {
   QueryInst  <- paste(Queryhttp,AccountID,sep="")
   QueryInst1 <- getURL(QueryInst,cainfo=system.file("CurlSSL","cacert.pem",
                 package="RCurl"),httpheader=auth)
-  InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+  InstJson   <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+  FinalData  <- data.frame(InstJson)
+  colnames(FinalData) <- c("Instrument","DisplayName","PipSize","MaxTradeUnits")
+  FinalData$MaxTradeUnits <- as.numeric(FinalData$MaxTradeUnits)
+
+return(FinalData)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Actual Price Request --------------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-ActualPrice <- function(AccountType,Token,Instrument) {
+ActualPrice <- function(AccountType,Token,Instrument)
+{
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -52,15 +59,17 @@ ActualPrice <- function(AccountType,Token,Instrument) {
                             InstPrecjson[[1]]$ask)
   colnames(DataJSON) <- c("TimeStamp","Bid","Ask")
   DataJSON$TimeStamp <- as.POSIXct(DataJSON$TimeStamp,origin="1970-01-01")
-  return(DataJSON)
+
+return(DataJSON)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Historical Prices Request ---------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-HisPrices <- function(AccountType,Granularity,DayAlign,TimeAlign,
-                       Token,Instrument,Start,End) {
+HisPrices <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,
+                      Start,End)
+{
   if(AccountType == "practice"){
     httpaccount  <- "https://api-fxpractice.oanda.com"
   } else 
@@ -90,14 +99,16 @@ HisPrices <- function(AccountType,Granularity,DayAlign,TimeAlign,
   Prices$time <- paste(substr(Prices$time,1,10),substr(Prices$time,12,19), sep=" ")
   colnames(Prices) <- c("TimeStamp","Open","High","Low","Close","TickVolume","Complete")
   Prices$TimeStamp <- as.POSIXct(Prices$TimeStamp,"%d/%m/%y %H:%M:%S",origin="1970-01-01")
-  return(Prices)
+  
+return(Prices)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Accounts per given username  ------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-UsersAccounts <- function(AccountType,Token,UserName) {
+UsersAccounts <- function(AccountType,Token,UserName)
+{
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -111,14 +122,16 @@ UsersAccounts <- function(AccountType,Token,UserName) {
   QueryInst1 <- getURL(QueryInst,cainfo=system.file("CurlSSL","cacert.pem",
                 package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Account Information  --------------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-AccountInfo   <- function(AccountType,AccountID,Token) {
+AccountInfo   <- function(AccountType,AccountID,Token)
+{
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -144,14 +157,16 @@ AccountInfo   <- function(AccountType,AccountID,Token) {
   CtaOrdens <- CtaInfoJson$openOrders      # Ordenes abiertas
   datos     <- data.frame(CtaNombre,CtaBalanc,Ctaunreal,Ctareal,Ctamgenut,
                Ctamgendi,Ctamgenrt,CtaOperac,CtaOrdens)
-  return(datos)
+
+return(datos)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Actual orders in the account ------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-AccountOrders  <- function(AccountType,AccountID,Token,Instrument) {
+AccountOrders  <- function(AccountType,AccountID,Token,Instrument)
+{
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -168,7 +183,8 @@ AccountOrders  <- function(AccountType,AccountID,Token,Instrument) {
   QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
@@ -176,7 +192,8 @@ AccountOrders  <- function(AccountType,AccountID,Token,Instrument) {
 # -- ------------------------------------------------------------------------------ -- #
 
 NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side,
-                     Expiry, Price, SL, TP, TS) {
+                     Expiry, Price, SL, TP, TS)
+{
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -205,16 +222,17 @@ NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side
 
   PF <- postForm(Queryhttp2, style="POST", .params=Param,
           .opts=list(httpheader=auth,ssl.verifypeer = TRUE))
-  
   InstJson <- fromJSON(PF, simplifyDataFrame = TRUE)
-  return(InstJson)
+  
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Close an order --------------------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-CloseOrder <- function(AccountType, AccountID, Token, OrderID) {
+CloseOrder <- function(AccountType, AccountID, Token, OrderID)
+{
   
   if(AccountType == "practice") {
     httpaccount <- "https://api-fxpractice.oanda.com"
@@ -233,7 +251,7 @@ CloseOrder <- function(AccountType, AccountID, Token, OrderID) {
   DELETEOrder <- httpDELETE(Queryhttp3, cainfo=system.file("CurlSSL","cacert.pem",
   package="RCurl"), httpheader=auth)
   
-  return(DELETEOrder)
+return(DELETEOrder)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
@@ -241,7 +259,8 @@ CloseOrder <- function(AccountType, AccountID, Token, OrderID) {
 # -- ------------------------------------------------------------------------------ -- #
 
 ModifyOrder <- function(AccountType, AccountID, Token, OrderID, Units, Price,
-                        Expiry, StopLoss, TakeProfit, TrailingStop) {
+                        Expiry, StopLoss, TakeProfit, TrailingStop)
+{
   
   if(AccountType == "practice") {
     httpaccount <- "https://api-fxpractice.oanda.com"
@@ -260,15 +279,18 @@ ModifyOrder <- function(AccountType, AccountID, Token, OrderID, Units, Price,
              takeProfit=TakeProfit, trailingStop=TrailingStop)
              
   PatchModifyOrder <- httpOPTIONS(Queryhttp3, cainfo=system.file("CurlSSL","cacert.pem",
-                                        package="RCurl"), httpheader=auth,.params=Param)
-  return(PatchModifyOrder)
+                                      package="RCurl"), httpheader=auth,.params=Param)
+
+return(PatchModifyOrder)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Order Book ------------------------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-OrderBook <- function(AccountType,Token,Instrument,Period) {
+OrderBook <- function(AccountType,Token,Instrument,Period)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -287,14 +309,17 @@ OrderBook <- function(AccountType,Token,Instrument,Period) {
   orderbook  <- getURL(Queryhttp3,cainfo=system.file("CurlSSL",
   "cacert.pem",package="RCurl"),httpheader=auth)
   orderbook  <- fromJSON(orderbook)
-  return(orderbook)
+
+return(orderbook)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Information about a particular order ----------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-OrderInfo  <- function(AccountType,AccountID,Token,OrderNum) {
+OrderInfo  <- function(AccountType,AccountID,Token,OrderNum)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -310,14 +335,17 @@ OrderInfo  <- function(AccountType,AccountID,Token,OrderNum) {
   QueryInst1  <- getURL(Querythttp3,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- List of open trades ---------------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-OpenTrades  <- function(AccountType,AccountID,Token,Instrument) {
+OpenTrades  <- function(AccountType,AccountID,Token,Instrument)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -334,14 +362,17 @@ OpenTrades  <- function(AccountType,AccountID,Token,Instrument) {
   QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- A particular trade's Information  -------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber) {
+TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -357,14 +388,72 @@ TradeInfo  <- function(AccountType,AccountID,Token,TradeNumber) {
   QueryInst1  <- getURL(Querythttp3,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
+}
+
+# -- ------------------------------------------------------------------------------ -- #
+# -- Close a particular trade ----------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
+
+CloseTrade  <- function(AccountType,AccountID,Token,TradeID)
+{
+  
+  if(AccountType == "practice"){
+    httpaccount <- "https://api-fxpractice.oanda.com"
+  } else 
+    if(AccountType == "live"){
+      httpaccount <- "https://api-fxtrade.oanda.com"
+    } else print("Account type error. Must be practice or live")
+  
+  auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
+  Queryhttp <- paste(httpaccount,"/v1/accounts/",sep="")
+  Querythttp1 <- paste(Queryhttp,AccountID,sep="")
+  Querythttp2 <- paste(Querythttp1,"/trades/",sep="")
+  Querythttp3 <- paste(Querythttp2,TradeID,sep="")
+  
+  auth  <- c(Authorization = paste("Authorization: Bearer",Token, sep=" "))
+  
+  DELETEOrder <- httpDELETE(Querythttp3, cainfo=system.file("CurlSSL","cacert.pem",
+                                        package="RCurl"), httpheader=auth)
+  FinalData <- fromJSON(DELETEOrder, simplifyDataFrame = TRUE)
+  
+return(FinalData)
+}
+
+# -- ------------------------------------------------------------------------------ -- #
+# -- Modify parameters of a trade ------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
+
+ModifyTrade <- function(AccountType, AccountID, Token, 
+                        TradeID, StopLoss, TakeProfit, TrailingStop)
+{
+  if(AccountType == "practice") {
+    httpaccount <- "https://api-fxpractice.oanda.com"
+  } else 
+  if(AccountType == "live") {
+      httpaccount <- "https://api-fxtrade.oanda.com"
+  } else print("Account type error. Must be practice or live")
+  
+  Queryhttp  <- paste(httpaccount,"/v1/accounts/", sep = "")
+  Queryhttp1 <- paste(Queryhttp,AccountID, sep = "")
+  Queryhttp2 <- paste(Queryhttp1,"/orders/", sep = "")
+  Queryhttp3 <- paste(Queryhttp2,TradeID, sep = "")
+  
+  auth   <- c(Authorization = paste("Authorization: Bearer",Token, sep=" "))
+  params <- list(stopLoss=StopLoss, takeProfit=TakeProfit, trailingStop=TrailingStop)
+  DataReturn <- PATCH(Queryhttp3, add_headers(auth),body = params)
+  
+return(DataReturn)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Account's Open Positions List ------------------------------------------------ -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-AccountPositions <- function(AccountType,AccountID,Token) {
+AccountPositions <- function(AccountType,AccountID,Token)
+{
+  
   if(AccountType == "practice"){
     httpaccount  <- "https://api-fxpractice.oanda.com"
   } else 
@@ -379,14 +468,17 @@ AccountPositions <- function(AccountType,AccountID,Token) {
   QueryInst1  <- getURL(Querythttp2,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Position respect a particular instrument ------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument) {
+InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -402,14 +494,17 @@ InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument) {
   QueryInst1  <- getURL(Querythttp3,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Historical of transactions --------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Count) {
+AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Count)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -427,14 +522,17 @@ AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Coun
   QueryInst1  <- getURL(Querythttp5,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- A particular transaction info  ----------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-InfoTransaction <- function(AccountType,AccountID,Token,TransactionNum) {
+InfoTransaction <- function(AccountType,AccountID,Token,TransactionNum)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -450,14 +548,17 @@ InfoTransaction <- function(AccountType,AccountID,Token,TransactionNum) {
   QueryInst1  <- getURL(Querythttp3,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
   InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(InstJson)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- General Info about all transactions of the account --------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-AccountTransactions  <- function(AccountType,AccountID,Token) {
+AccountTransactions  <- function(AccountType,AccountID,Token)
+{
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -471,15 +572,18 @@ AccountTransactions  <- function(AccountType,AccountID,Token) {
   Querythttp2 <- paste(Querythttp1,"/alltransactions",sep="")
   QueryInst1  <- getURL(Querythttp2,cainfo=system.file("CurlSSL","cacert.pem",
                   package="RCurl"),httpheader=auth)
-  # InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
-  return(QueryInst1)
+  InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+
+return(InstJson)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Economic Calendar ------------------------------------------------------------ -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-EconomicCalendar <- function(AccountType,Token,Instrument,Period) {
+EconomicCalendar <- function(AccountType,Token,Instrument,Period)
+{
+
   if(AccountType == "practice"){
     httpaccount  <- "https://api-fxpractice.oanda.com"
   } else 
@@ -501,14 +605,17 @@ EconomicCalendar <- function(AccountType,Token,Instrument,Period) {
   Calend <- subset(Calend, select = -c(currency,region,impact))
   Calend <- Calend[complete.cases(Calend[,]),]
   Calend$timestamp <- as.POSIXct(Calend$timestamp,origin = "1970-01-01")
-  return(Calend)
+
+return(Calend)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Historical posistion ratios in OANDA ----------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-RatiosPosturas  <- function(AccountType,Token,Instrument,Period) {
+RatiosPosturas  <- function(AccountType,Token,Instrument,Period)
+{
+
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -528,14 +635,17 @@ RatiosPosturas  <- function(AccountType,Token,Instrument,Period) {
             "cacert.pem",package="RCurl"),httpheader=auth)
   ratios <- data.frame(fromJSON(ratios))
   ratios[,2] <- as.POSIXct(ratios[,2],origin = "1970-01-01")
-  return(ratios)
+
+return(ratios)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Current OANDA's Clients Spreads ---------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-Spreads <- function(AccountType,Token,Instrument,Period) {
+Spreads <- function(AccountType,Token,Instrument,Period)
+{
+
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -554,14 +664,17 @@ Spreads <- function(AccountType,Token,Instrument,Period) {
   spread <- getURL(Queryhttp3,cainfo=system.file("CurlSSL",
             "cacert.pem",package="RCurl"),httpheader=auth)
   spread <- fromJSON(spread)
-  return(spread)
+
+return(spread)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Commitment Of Traders -------------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-COT <- function(AccountType,Token,Instrument) {
+COT <- function(AccountType,Token,Instrument)
+{
+
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -576,14 +689,17 @@ COT <- function(AccountType,Token,Instrument) {
   Queryhttp1 <- paste(Queryhttp,Instrument,sep="")
   Cot        <- getURL(Queryhttp,cainfo=system.file("CurlSSL",
                 "cacert.pem",package="RCurl"),httpheader=auth)
-  return(Cot)
+
+return(Cot)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Autochartist "Our Favorites" Signals ----------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-Autochartist <- function(AccountType,Token,Instrument,Period,Type) {
+Autochartist <- function(AccountType,Token,Instrument,Period,Type)
+{
+
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -604,14 +720,16 @@ Autochartist <- function(AccountType,Token,Instrument,Period,Type) {
   Autochart  <- getURL(Queryhttp5,cainfo=system.file("CurlSSL",
   "cacert.pem",package="RCurl"),httpheader=auth)
   Autochart  <- fromJSON(Autochart)
-  return(Autochart)
+
+return(Autochart)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
 # -- Close existing position ------------------------------------------------------ -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-ClosePosition <- function(AccountType, AccountID, Token, Inst) {
+ClosePosition <- function(AccountType, AccountID, Token, Inst)
+{
   
   if(AccountType == "practice") {
     httpaccount <- "https://api-fxpractice.oanda.com"
@@ -629,6 +747,7 @@ ClosePosition <- function(AccountType, AccountID, Token, Inst) {
   
   DELETEPosition <- httpDELETE(Queryhttp3, cainfo=system.file("CurlSSL","cacert.pem",
   package="RCurl"), httpheader=auth)
+  FinalData  <- fromJSON(DELETEPosition, simplifyDataFrame = TRUE)
   
-  return(DELETEPosition)
+return(FinalData)
 }
