@@ -91,6 +91,57 @@ Instrument   <- InstList[117,1]
 PastPriceAPI <- HisPrices(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,Start,End)
 ```
 
+### 5. Minimal Functional Example
 
+```r
+# -------------------------------------------------------------- Basic Trade Example -- #
+# -- Step 0 .- Get System Time -------------------------------------------------------- #
+# -- Step 1 .- Get Instrument Lists --------------------------------------------------- #
+# -- Step 2 .- Get current price of a chosen instrument ------------------------------- #
+# -- Step 3 .- Open a "buy" MARKET ORDER of previously chosen instrument -------------- #
+# -- Step 4 .- Get TradeID of previously Opened trade --------------------------------- #
+# -- Step 5 .- Modify TP and SL ------------------------------------------------------- #
+# -- Step 6 .- Close TradeID ---------------------------------------------------------- #
+# ------------------------------------------------------------------------------------- #
 
+# -- 0.- Get System Time
+Step0 <- Sys.time()
+
+# -- 1.- Get Instrument Lists
+Step1 <- InstrumentsList(OA_At,OA_Ak,OA_Ai)
+
+# -- 2 .- Get current price of a chosen instrument
+OA_In <- Step1[1,] # AU200_AUD
+Step2 <- ActualPrice(OA_At,OA_Ak,OA_In$Instrument)
+
+# -- 3 .- Open a "buy" market order of previously chosen instrument
+Step3 <- NewOrder(AccountType = OA_At,
+         AccountID  = OA_Ai,
+         Token = OA_Ak,
+         OrderType  = OA_Ot,
+         Instrument = OA_In$Instrument,
+         Count  = OA_Ls,
+         Side   = OA_Sd,
+         SL = trunc(Step2$Ask*0.95), # 5  % loss
+         TP = trunc(Step2$Ask*1.10), # 10 % Profit
+         TS = 100)                   # 10 Pips for Trailing Stop
+
+Step4 <- OpenTrades(AccountType = OA_At,
+                    AccountID = OA_Ai,
+                    Token = OA_Ak,
+                    Instrument = OA_In$Instrument)
+
+Step5 <- ModifyTrade(AccountType = OA_At,
+                     AccountID = OA_Ai,
+                     Token = OA_Ak,
+                     TradeID = 10406993698, 
+                     StopLoss = 0, 
+                     TakeProfit = 0,
+                     TrailingStop = 150)
+
+Step6 <- CloseTrade(AccountType = OA_At,
+                    AccountID = OA_Ai,
+                    Token = OA_Ak,
+                    TradeID = Step4$trades$id[1])
+```
 
