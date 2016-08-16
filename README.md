@@ -4,7 +4,18 @@ R Code API for Forex Trading with OANDA Broker (CFTC and SEC regulated retail br
 
 - **Initial Developer:** IF.FranciscoME
 - **License:** GNU General Public License
-- **Location:** Guadalajara, México
+- **Location:** Guadalajara, Mexico
+
+### Last Update 16-08-2016
+
+It was added the **Count** option to the HisPrices function, that is for retrieving a fixed amount of
+candles instead of retrieving whatever number of candles is present in a date range from **Start** to
+**End**. It is still available the option of getting the historic prices from a date range though. The
+**Count** option is to use the smaller granularity values since from 1 day to another there are more
+than 5000 candles and that is the limit from *OANDA* for the amount of history available per request.
+So now every request of Historic prices must include the **Count** parameter, if the request is for a
+date range the value of Count must be **NULL**, if the request is for a fixed amount of candles,
+the the values of **Start** and **End**, both, must be **NULL**.
 
 ## Previous Reading
 

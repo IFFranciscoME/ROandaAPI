@@ -67,9 +67,8 @@ return(DataJSON)
 # -- Historical Prices Request ---------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-HisPrices <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,
-                      Start,End)
-{
+HisPrices  <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,
+                       Start,End,Count){
   if(AccountType == "practice"){
     httpaccount  <- "https://api-fxpractice.oanda.com"
   } else 
@@ -77,30 +76,51 @@ HisPrices <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrumen
       httpaccount  <- "https://api-fxtrade.oanda.com"
     } else print("Account type error. Must be practice or live")
   
-  #ifelse(Count = is.NULL, qcount  <- paste("count=",Count,sep=""), break)
+  if(!is.null(Count)) {
+    
+    auth           <- c(Authorization = paste("Bearer",Token,sep=" "))
+    QueryHistPrec  <- paste(httpaccount,"/v1/candles?instrument=",sep="")
+    QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
+    
+    qcount  <- paste("count=",Count,sep="")
+    
+    qcandleFormat <- "candleFormat=midpoint"
+    qgranularity  <- paste("granularity=",Granularity,sep="")
+    qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
+    qalignmentTimezone <- paste("alignmentTimezone=",TimeAlign,sep="")
+    
+    QueryHistPrec2 <- paste(QueryHistPrec1,qcandleFormat,qgranularity,
+                            qdailyalignment,qalignmentTimezone,qcount,sep="&")
+    
+  }
   
-  qstart <- paste("start=",Start,sep="")
-  qend   <- paste("end=",End,sep="")
+  else {
+    
+    auth           <- c(Authorization = paste("Bearer",Token,sep=" "))
+    QueryHistPrec  <- paste(httpaccount,"/v1/candles?instrument=",sep="")
+    QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
+    
+    qstart <- paste("start=",Start,sep="")
+    qend   <- paste("end=",End,sep="")
+    
+    qcandleFormat  <- "candleFormat=midpoint"
+    qgranularity   <- paste("granularity=",Granularity,sep="")
+    qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
+    qalignmentTimezone <- paste("alignmentTimezone=",TimeAlign,sep="")
+    
+    QueryHistPrec2 <- paste(QueryHistPrec1,qstart,qend,qcandleFormat,qgranularity,
+                            qdailyalignment,qalignmentTimezone,sep="&")
+    
+  }
   
-  qcandleFormat  <- "candleFormat=midpoint"
-  qgranularity   <- paste("granularity=",Granularity,sep="")
-  qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
-  qalignmentTimezone <- paste("alignmentTimezone=",TimeAlign,sep="")
-  
-  auth           <- c(Authorization = paste("Bearer",Token,sep=" "))
-  QueryHistPrec  <- paste(httpaccount,"/v1/candles?instrument=",sep="")
-  QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
-  QueryHistPrec2 <- paste(QueryHistPrec1,qstart,qend,qcandleFormat,qgranularity,
-                    qdailyalignment,qalignmentTimezone,sep="&")
   InstHistP <- getURL(QueryHistPrec2,cainfo=system.file("CurlSSL","cacert.pem",
-               package="RCurl"),httpheader=auth)
+                                                        package="RCurl"),httpheader=auth)
   InstHistPjson <- fromJSON(InstHistP, simplifyDataFrame = TRUE)
   Prices        <- data.frame(InstHistPjson[[3]])
   Prices$time <- paste(substr(Prices$time,1,10),substr(Prices$time,12,19), sep=" ")
   colnames(Prices) <- c("TimeStamp","Open","High","Low","Close","TickVolume","Complete")
   Prices$TimeStamp <- as.POSIXct(Prices$TimeStamp,"%d/%m/%y %H:%M:%S",origin="1970-01-01")
-  
-return(Prices)
+  return(Prices)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
