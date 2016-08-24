@@ -87,10 +87,9 @@ HisPrices  <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrume
     qcandleFormat <- "candleFormat=midpoint"
     qgranularity  <- paste("granularity=",Granularity,sep="")
     qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
-    qalignmentTimezone <- paste("alignmentTimezone=",TimeAlign,sep="")
     
     QueryHistPrec2 <- paste(QueryHistPrec1,qcandleFormat,qgranularity,
-                            qdailyalignment,qalignmentTimezone,qcount,sep="&")
+                            qdailyalignment,qcount,sep="&")
     
   }
   
@@ -106,11 +105,9 @@ HisPrices  <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrume
     qcandleFormat  <- "candleFormat=midpoint"
     qgranularity   <- paste("granularity=",Granularity,sep="")
     qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
-    qalignmentTimezone <- paste("alignmentTimezone=",TimeAlign,sep="")
     
     QueryHistPrec2 <- paste(QueryHistPrec1,qstart,qend,qcandleFormat,qgranularity,
-                            qdailyalignment,qalignmentTimezone,sep="&")
-    
+                            qdailyalignment,sep="&")
   }
   
   InstHistP <- getURL(QueryHistPrec2,cainfo=system.file("CurlSSL","cacert.pem",
@@ -120,7 +117,8 @@ HisPrices  <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrume
   Prices$time <- paste(substr(Prices$time,1,10),substr(Prices$time,12,19), sep=" ")
   colnames(Prices) <- c("TimeStamp","Open","High","Low","Close","TickVolume","Complete")
   Prices$TimeStamp <- as.POSIXct(strptime(Prices$TimeStamp, "%Y-%m-%d %H:%M:%OS"),
-                                 origin="1970-01-01")
+                                 origin="1970-01-01",tz = "UTC")
+  attributes(Prices$TimeStamp)$tzone <- TimeAlign
   return(Prices)
 }
 
