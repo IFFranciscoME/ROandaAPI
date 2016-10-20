@@ -240,7 +240,7 @@ NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side
   } else print("Order Type error. Must be: 'market', 'limit', 'stop', 'marketIfTouched'")
 
   PF <- postForm(Queryhttp2, style="POST", .params=Param,
-          .opts=list(httpheader=auth,ssl.verifypeer = TRUE))
+          .opts=list(httpheader=auth,ssl.verifypeer = FALSE))
   InstJson <- fromJSON(PF, simplifyDataFrame = TRUE)
   
 return(InstJson)
