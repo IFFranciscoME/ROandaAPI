@@ -716,7 +716,7 @@ return(Cot)
 # -- Autochartist "Our Favorites" Signals ----------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-Autochartist <- function(AccountType,Token,Instrument,Period,Type)
+Autochartist_Inst <- function(AccountType,Token,Instrument,Period,Type)
 {
 
   if(AccountType == "practice"){
@@ -731,12 +731,8 @@ Autochartist <- function(AccountType,Token,Instrument,Period,Type)
   
   Queryhttp  <- paste(httpaccount,"/labs/v1/signal/autochartist?instrument=",sep="")
   Queryhttp1 <- paste(Queryhttp,Instrument,sep="")
-  Queryhttp2 <- paste(Queryhttp1,"period=",sep="&")
-  Queryhttp3 <- paste(Queryhttp2,Period,sep="")
-  Queryhttp4 <- paste(Queryhttp3,"type=",sep="")
-  Queryhttp5 <- paste(Queryhttp4,Type,sep="")
   
-  Autochart  <- getURL(Queryhttp5,cainfo=system.file("CurlSSL",
+  Autochart  <- getURL(Queryhttp1,cainfo=system.file("CurlSSL",
   "cacert.pem",package="RCurl"),httpheader=auth)
   Autochart  <- fromJSON(Autochart)
 
