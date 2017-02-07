@@ -64,6 +64,68 @@ return(DataJSON)
 }
 
 # -- ------------------------------------------------------------------------------ -- #
+# -- Historical Spreads Request --------------------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
+
+HisSpreads <- function(AccountType,Granularity,DayAlign,TimeAlign,Token,Instrument,
+                       Start,End,Count)  {
+
+  if(AccountType == "practice"){
+    httpaccount  <- "https://api-fxpractice.oanda.com"
+  } else 
+    if(AccountType == "live"){
+      httpaccount  <- "https://api-fxtrade.oanda.com"
+    } else print("Account type error. Must be practice or live")
+  
+  if(!is.null(Count)) {
+    
+    auth           <- c(Authorization = paste("Bearer",Token,sep=" "))
+    QueryHistPrec  <- paste(httpaccount,"/v1/candles?instrument=",sep="")
+    QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
+    
+    qcount  <- paste("count=",Count,sep="")
+    
+    qcandleFormat <- "candleFormat=bidask"
+    qgranularity  <- paste("granularity=",Granularity,sep="")
+    qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
+    
+    QueryHistPrec2 <- paste(QueryHistPrec1,qcandleFormat,qgranularity,
+                            qdailyalignment,qcount,sep="&")
+
+  }
+
+  else {
+
+    auth           <- c(Authorization = paste("Bearer",Token,sep=" "))
+    QueryHistPrec  <- paste(httpaccount,"/v1/candles?instrument=",sep="")
+    QueryHistPrec1 <- paste(QueryHistPrec,Instrument,sep="")
+    
+    qstart <- paste("start=",Start,sep="")
+    qend   <- paste("end=",End,sep="")
+    
+    qcandleFormat  <- "candleFormat=bidask"
+    qgranularity   <- paste("granularity=",Granularity,sep="")
+    qdailyalignment    <- paste("dailyAlignment=",DayAlign,sep="")
+    
+    QueryHistPrec2 <- paste(QueryHistPrec1,qstart,qend,qcandleFormat,qgranularity,
+                            qdailyalignment,sep="&")
+  }
+
+  InstHistP <- getURL(QueryHistPrec2,cainfo=system.file("CurlSSL","cacert.pem",
+                                                        package="RCurl"),httpheader=auth)
+  InstHistPjson <- fromJSON(InstHistP, simplifyDataFrame = TRUE)
+  Prices        <- data.frame(InstHistPjson[[3]])
+  Prices$time <- paste(substr(Prices$time,1,10),substr(Prices$time,12,19), sep=" ")
+  
+  colnames(Prices) <- c("TimeStamp", "Open_Bid", "Open_Ask", "High_Bid", "High_Ask",
+                        "Low_Bid", "Low_Ask", "Close_Bid", "Close_Ask", "Volume", "Complete")
+  Prices$TimeStamp <- as.POSIXct(strptime(Prices$TimeStamp, "%Y-%m-%d %H:%M:%OS"),
+                                 origin="1970-01-01",tz = "UTC")
+  attributes(Prices$TimeStamp)$tzone <- TimeAlign
+  return(Prices)
+}
+
+# -- ------------------------------------------------------------------------------ -- #
 # -- Historical Prices Request ---------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
