@@ -828,3 +828,29 @@ ClosePosition <- function(AccountType, AccountID, Token, Inst)
   
 return(FinalData)
 }
+
+# -- ------------------------------------------------------------------------------ -- #
+# -- Live FX Rates Streaming (On Test Phase) -------------------------------------- -- #
+# -- ------------------------------------------------------------------------------ -- #
+
+LiveRates <- function(AccountType, AccountID, Token, Inst)
+{
+  
+  if(AccountType == "practice"){
+    httpaccount <- "https://stream-fxtrade.oanda.com"
+  } else 
+    if(AccountType == "live"){
+      httpaccount <- "https://stream-fxtrade.oanda.com"
+    } else print("Account type error. Must be practice or live")
+  
+  auth  <- c(Authorization = paste("Bearer",Token,sep=" "))
+  auth1 <- paste("Authorization:",auth,sep=" ")
+  
+  http  <- paste(httpaccount,"/v1/prices?accountid=", AccountID, "&instruments=",Inst,sep="")
+
+  StreamPrice <- getURL(http,cainfo=system.file("CurlSSL","cacert.pem",package="RCurl"),
+                        httpheader=auth)
+  DataStream  <- fromJSON(StreamPrice)
+  
+return(DataStream)
+}
