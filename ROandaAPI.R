@@ -9,8 +9,12 @@
 # -- List of available instruments ------------------------------------------------ -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-InstrumentsList <- function(AccountType,Token,AccountID)
-{
+InstrumentsList <- function(AccountType, Token, AccountID, ApiVersion) {
+
+if(is.null(ApiVersion) || ApiVersion == "v1"){
+
+  # -- ------------------------------------------------------------------ Version 1.0 -- #
+  # -- --------------------------------------------------------------------------------- #
 
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
@@ -30,6 +34,44 @@ InstrumentsList <- function(AccountType,Token,AccountID)
   FinalData$MaxTradeUnits <- as.numeric(FinalData$MaxTradeUnits)
 
 return(FinalData)
+}
+
+  # -- ---------------------------------------------------------------- Version 2.0 -- #
+  # -- ------------------------------------------------------------------------------- #
+
+else if (ApiVersion == "v2"){
+  
+  if(AccountType == "practice"){
+    httpaccount <- "https://api-fxpractice.oanda.com"
+  } else if (AccountType == "live"){
+    httpaccount <- "https://api-fxtrade.oanda.com"
+  } else {
+    print("Account type error. Must be practice or live")
+  }
+    
+  auth       <- c(Authorization = paste("Bearer",Token,sep=" "))
+  Queryhttp  <- paste(httpaccount,"/v3/accounts/",sep="")
+  QueryInst  <- paste(Queryhttp,AccountID,"/","instruments", sep="")
+  QueryInst1 <- getURL(QueryInst,cainfo=system.file("CurlSSL","cacert.pem",
+                                                    package="RCurl"),httpheader=auth)
+  InstJson   <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+  FinalData  <- data.frame(InstJson)
+
+  return(FinalData)
+}
+  
+  # -- ------------------------------------------------------------------ Test Code -- #
+  # -- ------------------------------------------------------------------------------- #
+  
+  # p1_AccountType <- "practice"
+  # p2_Token <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" 
+  # p3_AccountID   <- "XXX-XXX-XXXXXXX-XXX"
+  # p4_ApiVersion  <- "v2"
+  # oa_instruments <- InstrumentsList(AccountType = p1_AccountType,
+  #                                   Token = p2_Token,
+  #                                   AccountID = p3_AccountID,
+  #                                   ApiVersion = p4_ApiVersion) 
+  
 }
 
 # -- ------------------------------------------------------------------------------ -- #
