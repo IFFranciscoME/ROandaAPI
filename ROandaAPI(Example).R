@@ -1,4 +1,7 @@
 
+# -- Remove all objects from enviornment
+rm(list=ls())
+
 # -- Rquired Packages in order to use the R API
 library("downloader")
 library("RCurl")

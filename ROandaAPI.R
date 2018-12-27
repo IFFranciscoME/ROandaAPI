@@ -11,8 +11,10 @@
 
 InstrumentsList <- function(AccountType, Token, AccountID, ApiVersion) {
 
-if(is.null(ApiVersion) || ApiVersion == "v1"){
+if(missing(ApiVersion) || ApiVersion == "v1"){
 
+  ApiVersion <- "v1"
+  
   # -- ------------------------------------------------------------------ Version 1.0 -- #
   # -- --------------------------------------------------------------------------------- #
 
@@ -34,12 +36,11 @@ if(is.null(ApiVersion) || ApiVersion == "v1"){
   FinalData$MaxTradeUnits <- as.numeric(FinalData$MaxTradeUnits)
 
 return(FinalData)
-}
 
   # -- ---------------------------------------------------------------- Version 2.0 -- #
   # -- ------------------------------------------------------------------------------- #
 
-else if (ApiVersion == "v2"){
+} else if (ApiVersion == "v2"){
   
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
@@ -253,8 +254,8 @@ return(InstJson)
 # -- Account Information  --------------------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
 
-AccountInfo   <- function(AccountType,AccountID,Token)
-{
+AccountInfo   <- function(AccountType,AccountID,Token) {
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
   } else 
@@ -284,45 +285,94 @@ AccountInfo   <- function(AccountType,AccountID,Token)
 return(datos)
 }
 
-# -- ------------------------------------------------------------------------------ -- #
-# -- Actual orders in the account ------------------------------------------------- -- #
-# -- ------------------------------------------------------------------------------ -- #
+# -- ----------------------------------------------------------------------------------------- -- #
+# -- Actual orders in the account ------------------------------------------------------------ -- #
+# -- ----------------------------------------------------------------------------------------- -- #
 
-AccountOrders  <- function(AccountType,AccountID,Token,Instrument)
-{
+AccountOrders  <- function(AccountType,AccountID,Token,Instrument,ApiVersion) {
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
-  } else 
-    if(AccountType == "live"){
-      httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error. Must be practice or live")
+  } else if (AccountType == "live"){
+    httpaccount <- "https://api-fxtrade.oanda.com"
+  } else {
+    print("Account type error. Must be practice or live")
+  }
   
-  auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
-  Queryhttp <- paste(httpaccount,"/v1/accounts/",sep="")
-  Querythttp1 <- paste(Queryhttp,AccountID,sep="")
-  Querythttp2 <- paste(Querythttp1,"/orders?instrument=",sep="")
-  Querythttp3 <- paste(Querythttp2,Instrument,sep="")
-  Querythttp4 <- paste(Querythttp3,"&count=2",sep="")
-  QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
-                  package="RCurl"),httpheader=auth)
-  InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+  if(missing(ApiVersion) || ApiVersion == "v1"){
+    
+    ApiVersion <- "v1"
+    
+  # -- --------------------------------------------------------------------------- Version 1.0 -- #
+  # -- ------------------------------------------------------------------------------------------ #
+  
+    auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
+    Queryhttp <- paste(httpaccount,"/v1/accounts/",sep="")
+    Querythttp1 <- paste(Queryhttp,AccountID,sep="")
+    Querythttp2 <- paste(Querythttp1,"/orders?instrument=",sep="")
+    Querythttp3 <- paste(Querythttp2,Instrument,sep="")
+    Querythttp4 <- paste(Querythttp3,"&count=2",sep="")
+    QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
+                                                         package="RCurl"),httpheader=auth)
+    InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
 
 return(InstJson)
+
+  # -- --------------------------------------------------------------------------- Version 2.0 -- #
+  # -- ------------------------------------------------------------------------------------------ #
+  
+  } else if (ApiVersion == "v2") {
+
+    auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
+    Queryhttp <- paste(httpaccount,"/v3/accounts/",sep="")
+    Querythttp1 <- paste(Queryhttp,AccountID,sep="")
+    Querythttp2 <- paste(Querythttp1,"/orders?instrument=",sep="")
+    Querythttp3 <- paste(Querythttp2,Instrument,sep="")
+    Querythttp4 <- paste(Querythttp3,"&count=2",sep="")
+    QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
+                                                         package="RCurl"),httpheader=auth)
+    InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+
+return(InstJson)
+  }
+  
+  # -- ----------------------------------------------------------------------------- Test Code -- #
+  # -- ------------------------------------------------------------------------------------------ #
+  
+  # p1_AccountType <- "practice"
+  # p2_Token <- OA_Ak
+  # p3_Instrument  <- "EUR_USD"
+  # p4_AccountID   <- "101-004-2221697-001"
+  # p5_ApiVersion  <- "v1"
+  # oa_orders <- AccountOrders(AccountType = p1_AccountType,
+  #                            Token = p2_Token,
+  #                            Instrument = p3_Instrument,
+  #                            AccountID = p4_AccountID,
+  #                            ApiVersion = p5_ApiVersion)
+
 }
 
-# -- ------------------------------------------------------------------------------ -- #
-# -- Place a new order ------------------------------------------------------------ -- #
-# -- ------------------------------------------------------------------------------ -- #
+# -- ----------------------------------------------------------------------------------------- -- #
+# -- Place a new order ----------------------------------------------------------------------- -- #
+# -- ----------------------------------------------------------------------------------------- -- #
 
-NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side,
-                     Expiry, Price, SL, TP, TS)
-{
+NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side,Expiry,
+                     Price, SL, TP, TS, ApiVersion) {
+  
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
-  } else 
-    if(AccountType == "live"){
-      httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error. Must be practice or live")
+  } else if (AccountType == "live"){
+    httpaccount <- "https://api-fxtrade.oanda.com"
+  } else {
+    print("Account type error. Must be practice or live")
+  }
+  
+  if(missing(ApiVersion) || ApiVersion == "v1"){
+    
+    ApiVersion <- "v1"
+    
+  # -- --------------------------------------------------------------------------- Version 1.0 -- #
+  # -- ------------------------------------------------------------------------------------------ #
   
   auth       <- c(Authorization = paste("Authorization: Bearer",Token,sep=" "))
   Queryhttp  <- paste(httpaccount,"/v1/accounts/",sep="")
@@ -348,6 +398,61 @@ NewOrder <- function(AccountType,AccountID,Token,OrderType,Instrument,Count,Side
   InstJson <- fromJSON(PF, simplifyDataFrame = TRUE)
   
 return(InstJson)
+  
+  } else {
+    
+    auth       <- paste0("Bearer ",Token)
+    Queryhttp  <- paste(httpaccount,"/v3/accounts/",sep="")
+    Queryhttp1 <- paste(Queryhttp,AccountID,sep="")
+    Queryhttp2 <- paste(Queryhttp1,"/orders",sep="")
+    
+    Count        <- 5
+    Instrument   <- "EUR_USD"
+    TimeInForce  <- "FOK"
+    PositionFill <- "DEFAULT"
+    OrderType    <- "MARKET"
+    
+    tradeID   <- 43
+    OrderType <- "TAKE_PROFIT"
+    Price <- 1.7000
+    TimeInForce <- "GTC"
+    
+    if(OrderType == 'TAKE_PROFIT'){
+      
+      parse1 <- '{"order":{'
+      parse2 <- paste0(parse1, paste0('"tradeID":'     , '"', tradeID,        '"', ','))
+      parse3 <- paste0(parse2, paste0('"timeInForce":' , '"', TimeInForce,  '"', ','))
+      parse4 <- paste0(parse3, paste0('"type":'        , '"', OrderType,    '"', ','))
+      parse5 <- paste0(parse4, paste0('"price":'       , '"', Price,'"'))
+      parse_body <- paste0(parse5, '}}')
+
+    } else  if(OrderType == 'MARKET'){
+      
+      parse1 <- '{"order":{'
+      parse2 <- paste0(parse1, paste0('"units":'       , '"', Count,        '"', ','))
+      parse3 <- paste0(parse2, paste0('"instrument":'  , '"', Instrument,   '"', ','))
+      parse4 <- paste0(parse3, paste0('"timeInForce":' , '"', TimeInForce,  '"', ','))
+      parse5 <- paste0(parse4, paste0('"type":'        , '"', OrderType,    '"', ','))
+      parse6 <- paste0(parse5, paste0('"positionFill":', '"', PositionFill, '"'))
+      parse_body <- paste0(parse6, '}}')
+      
+    } else  if(OrderType == 'STOP_LOSS'){
+    } else  if(OrderType == 'LIMIT'){
+    } else  if(OrderType == 'TRAILING_STOP_LOSS'){
+    } else  if(OrderType == 'FIXED_PRICE'){
+    } else  if(OrderType == 'STOP'){
+    } else  if(OrderType == 'MARKET_IF_TOUCHED'){
+    } else print("Order Type error. Must be: 'FIXED_PRICE', 'LIMIT', 'STOP', 'MARKET_IF_TOUCHED',
+                 'TAKE_PROFIT', 'STOP_LOSS', 'TRAILING_STOP_LOSS'")
+    
+    InstJson <- content(POST(url = Queryhttp2, encode = "raw", body = parse_body,
+                             add_headers("Authorization" = auth,
+                                         "Content-Type" = "application/json")), "parsed")
+    
+    return(InstJson)
+
+  }
+
 }
 
 # -- ------------------------------------------------------------------------------ -- #
@@ -462,31 +567,69 @@ OrderInfo  <- function(AccountType,AccountID,Token,OrderNum)
 return(InstJson)
 }
 
-# -- ------------------------------------------------------------------------------ -- #
-# -- List of open trades ---------------------------------------------------------- -- #
-# -- ------------------------------------------------------------------------------ -- #
+# -- ----------------------------------------------------------------------------------------- -- #
+# -- List of open trades --------------------------------------------------------------------- -- #
+# -- ----------------------------------------------------------------------------------------- -- #
 
-OpenTrades  <- function(AccountType,AccountID,Token,Instrument)
-{
+OpenTrades  <- function(AccountType,AccountID,Token,Instrument,ApiVersion) {
   
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
-  } else 
-    if(AccountType == "live"){
-      httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error. Must be practice or live")
+  } else if (AccountType == "live"){
+    httpaccount <- "https://api-fxtrade.oanda.com"
+  } else {
+    print("Account type error. Must be practice or live")
+  }
   
-  auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
-  Queryhttp <- paste(httpaccount,"/v1/accounts/",sep="")
-  Querythttp1 <- paste(Queryhttp,AccountID,sep="")
-  Querythttp2 <- paste(Querythttp1,"/trades?instrument=",sep="")
-  Querythttp3 <- paste(Querythttp2,Instrument,sep="")
-  Querythttp4 <- paste(Querythttp3,"&count=100",sep="")
-  QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
-                  package="RCurl"),httpheader=auth)
-  InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+  if(missing(ApiVersion) || ApiVersion == "v1"){
+    
+    ApiVersion <- "v1"
+    
+  # -- --------------------------------------------------------------------------- Version 1.0 -- #
+  # -- ------------------------------------------------------------------------------------------ #
+  
+    auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
+    Queryhttp <- paste(httpaccount,"/v1/accounts/",sep="")
+    Querythttp1 <- paste(Queryhttp,AccountID,sep="")
+    Querythttp2 <- paste(Querythttp1,"/trades?instrument=",sep="")
+    Querythttp3 <- paste(Querythttp2,Instrument,sep="")
+    Querythttp4 <- paste(Querythttp3,"&count=100",sep="")
+    QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
+                                                         package="RCurl"),httpheader=auth)
+    InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
 
 return(InstJson)
+  
+  # -- --------------------------------------------------------------------------- Version 2.0 -- #
+  # -- ------------------------------------------------------------------------------------------ #
+  
+  } else if (ApiVersion == "v2") {
+
+    auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
+    Queryhttp <- paste(httpaccount,"/v3/accounts/",sep="")
+    Querythttp1 <- paste(Queryhttp,AccountID,sep="")
+    Querythttp2 <- paste(Querythttp1,"/trades?instrument=",sep="")
+    Querythttp3 <- paste(Querythttp2,Instrument,sep="")
+    Querythttp4 <- paste(Querythttp3,"&count=100",sep="")
+    QueryInst1  <- getURL(Querythttp4,cainfo=system.file("CurlSSL","cacert.pem",
+                                                         package="RCurl"),httpheader=auth)
+    InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+  
+return(InstJson)
+  }
+  
+  # -- ----------------------------------------------------------------------------- Test Code -- #
+  # -- ------------------------------------------------------------------------------------------ #
+
+  # p1_AccountType <- "practice"
+  # p2_Token       <- OA_Ak
+  # p3_Instrument  <- "EUR_USD"
+  # p4_AccountID   <- "XXX-XXX-XXXXXXX-XXX"
+  # p5_ApiVersion  <- "v2"
+  # OA_OpenTrades  <- OpenTrades(AccountType = p1_AccountType, AccountID = p4_AccountID,
+  #                              Token = p2_Token, Instrument = p3_Instrument,
+  #                              ApiVersion = p5_ApiVersion)
+  
 }
 
 # -- ------------------------------------------------------------------------------ -- #
@@ -621,34 +764,76 @@ InstrumentPositions  <- function(AccountType,AccountID,Token,Instrument)
 return(InstJson)
 }
 
-# -- ------------------------------------------------------------------------------ -- #
-# -- Historical of transactions --------------------------------------------------- -- #
-# -- ------------------------------------------------------------------------------ -- #
+# -- ----------------------------------------------------------------------------------------- -- #
+# -- Historical of transactions -------------------------------------------------------------- -- #
+# -- ----------------------------------------------------------------------------------------- -- #
 
-AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Count)
-{
+AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Count,ApiVersion) {
   
   if(AccountType == "practice"){
     httpaccount <- "https://api-fxpractice.oanda.com"
-  } else 
-    if(AccountType == "live"){
-      httpaccount <- "https://api-fxtrade.oanda.com"
-    } else print("Account type error. Must be practice or live")
+  } else if (AccountType == "live"){
+    httpaccount <- "https://api-fxtrade.oanda.com"
+  } else {
+    print("Account type error. Must be practice or live")
+  }
   
-  auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
-  Queryhttp <- paste(httpaccount,"/v1/accounts/",sep="")
-  Querythttp1 <- paste(Queryhttp,AccountID,sep="")
-  Querythttp2 <- paste(Querythttp1,"/transactions?instrument=",sep="")
-  Querythttp3 <- paste(Querythttp2,Instrument,sep="")
-  Querythttp4 <- paste(Querythttp3,"&count=",sep="")
-  Querythttp5 <- paste(Querythttp4,Count,sep="")
-  QueryInst1  <- getURL(Querythttp5,cainfo=system.file("CurlSSL","cacert.pem",
-                  package="RCurl"),httpheader=auth)
-  InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+  if(missing(ApiVersion) || ApiVersion == "v1") {
+    
+    ApiVersion <- "v1"
+    
+    # -- --------------------------------------------------------------------------- Version 1.0 -- #
+    # -- ------------------------------------------------------------------------------------------ #
+  
+    auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
+    Queryhttp <- paste(httpaccount,"/v1/accounts/",sep="")
+    Querythttp1 <- paste(Queryhttp,AccountID,sep="")
+    Querythttp2 <- paste(Querythttp1,"/transactions?instrument=",sep="")
+    Querythttp3 <- paste(Querythttp2,Instrument,sep="")
+    Querythttp4 <- paste(Querythttp3,"&count=",sep="")
+    Querythttp5 <- paste(Querythttp4,Count,sep="")
+    QueryInst1  <- getURL(Querythttp5,cainfo=system.file("CurlSSL","cacert.pem",
+                                                         package="RCurl"),httpheader=auth)
+    InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
 
-return(InstJson)
+    return(InstJson)
+    
+    # -- --------------------------------------------------------------------------- Version 2.0 -- #
+    # -- ------------------------------------------------------------------------------------------ #
+    
+  } else if (ApiVersion == "v2") {
+    
+    auth      <- c(Authorization = paste("Bearer",Token,sep=" "))
+    Queryhttp <- paste(httpaccount,"/v3/accounts/",sep="")
+    Querythttp1 <- paste(Queryhttp,AccountID,sep="")
+    Querythttp2 <- paste(Querythttp1,"/transactions?instrument=",sep="")
+    Querythttp3 <- paste(Querythttp2,Instrument,sep="")
+    Querythttp4 <- paste(Querythttp3,"&count=",sep="")
+    Querythttp5 <- paste(Querythttp4,Count,sep="")
+    QueryInst1  <- getURL(Querythttp5,cainfo=system.file("CurlSSL","cacert.pem",
+                                                         package="RCurl"),httpheader=auth)
+    InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
+    
+    return(InstJson)
+
 }
 
+  # -- ----------------------------------------------------------------------------- Test Code -- #
+  # -- ------------------------------------------------------------------------------------------ #
+  
+  # p1_AccountType <- "practice"
+  # p2_Token       <- OA_Ak
+  # p3_Instrument  <- "EUR_USD"
+  # p4_AccountID   <- OA_A2
+  # p5_ApiVersion  <- "v2"
+  # p6_Count <- 2
+  # OA_HistTrans  <- AccountHistTransactions(AccountType = p1_AccountType,
+  #                                          AccountID = p4_AccountID,
+  #                                          Token = p2_Token, Instrument = p3_Instrument,
+  #                                           Count = p6_Count, ApiVersion = p5_ApiVersion)
+
+}
+  
 # -- ------------------------------------------------------------------------------ -- #
 # -- A particular transaction info  ----------------------------------------------- -- #
 # -- ------------------------------------------------------------------------------ -- #
