@@ -814,7 +814,16 @@ AccountHistTransactions  <- function(AccountType,AccountID,Token,Instrument,Coun
                                                          package="RCurl"),httpheader=auth)
     InstJson <- fromJSON(QueryInst1, simplifyDataFrame = TRUE)
     
-    return(InstJson)
+    pagesize <- InstJson$pageSize
+    count    <- InstJson$count
+    Hist <- data.frame()
+    
+    curl_options(filter = "FUNDING")
+    pag <- paste0(InstJson$pages[1])
+    QI1 <- getURL(pag,cainfo=system.file("CurlSSL","cacert.pem", package="RCurl"), httpheader=auth)
+    IJ  <- fromJSON(QI1, simplifyDataFrame = TRUE)
+   
+    return(IJ)
 
 }
 
